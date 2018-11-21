@@ -13,9 +13,7 @@ Added:
 
 What additional edit functions(existing python operators) should we add?
 
-
 Installation:
 Place the two files included into these paths before starting Blender 2.80:
-
 2.80\scripts\startup\bl_operators\sequencer.py
 2.80\scripts\startup\bl_ui\space_sequencer.py
