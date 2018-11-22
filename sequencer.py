@@ -198,7 +198,7 @@ class SequencerReverseSelectedMovies(Operator):
         
 
 class SequencerFlipXSelectedMovies(Operator):
-    """Reverse all selected movie sources"""
+    """Flip X of all selected movie sources"""
 
     bl_idname = "sequencer.flip_x_selected_movies"
     bl_label = "Flip X Movies"
@@ -216,7 +216,7 @@ class SequencerFlipXSelectedMovies(Operator):
 
 
 class SequencerFlipYSelectedMovies(Operator):
-    """Reverse all selected movie sources"""
+    """Flip Y of all selected movie sources"""
 
     bl_idname = "sequencer.flip_y_selected_movies"
     bl_label = "Flip Y Movies"
