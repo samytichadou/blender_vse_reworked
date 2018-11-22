@@ -179,7 +179,60 @@ class SequencerDeinterlaceSelectedMovies(Operator):
                 s.use_deinterlace = True
         return {'FINISHED'}
 
+class SequencerReverseSelectedMovies(Operator):
+    """Reverse all selected movie sources"""
 
+    bl_idname = "sequencer.reverse_selected_movies"
+    bl_label = "Reverse Movies"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene and context.scene.sequence_editor)
+
+    def execute(self, context):
+        for s in context.scene.sequence_editor.sequences_all:
+            if s.select and s.type == 'MOVIE':
+                s.use_reverse_frames = True
+        return {'FINISHED'}
+        
+
+class SequencerFlipXSelectedMovies(Operator):
+    """Flip X of all selected movie sources"""
+
+    bl_idname = "sequencer.flip_x_selected_movies"
+    bl_label = "Flip X Movies"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene and context.scene.sequence_editor)
+
+    def execute(self, context):
+        for s in context.scene.sequence_editor.sequences_all:
+            if s.select and s.type == 'MOVIE':
+                s.use_flip_x = True
+        return {'FINISHED'}
+
+
+class SequencerFlipYSelectedMovies(Operator):
+    """Flip Y of all selected movie sources"""
+
+    bl_idname = "sequencer.flip_y_selected_movies"
+    bl_label = "Flip Y Movies"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene and context.scene.sequence_editor)
+
+    def execute(self, context):
+        for s in context.scene.sequence_editor.sequences_all:
+            if s.select and s.type == 'MOVIE':
+                s.use_flip_y = True
+        return {'FINISHED'}
+
+        
 class SequencerSelectTimeCursor(bpy.types.Operator):
     """Select strips under time cursor"""
     
@@ -255,6 +308,9 @@ classes = (
     SequencerCrossfadeSounds,
     SequencerCutMulticam,
     SequencerDeinterlaceSelectedMovies,
+    SequencerReverseSelectedMovies,
+    SequencerFlipXSelectedMovies,
+    SequencerFlipYSelectedMovies,   
     SequencerRippleDelete,
     SequencerSelectTimeCursor,
     SequencerSelectChannel,
