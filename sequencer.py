@@ -25,7 +25,7 @@
 
 import bpy
 from bpy.types import Operator
-
+from operator import attrgetter
 from bpy.props import IntProperty
 
 
@@ -81,7 +81,8 @@ class SequencerCrossfadeSounds(Operator):
         
         
 class SequencerRippleDelete(bpy.types.Operator):
-    '''Ripple delete strips'''
+    """Ripple delete strips"""
+    
     bl_idname = "sequencer.ripple_delete"
     bl_label = "Ripple Delete Selection"
     bl_options = {'REGISTER', 'UNDO'}    
@@ -178,9 +179,83 @@ class SequencerDeinterlaceSelectedMovies(Operator):
                 s.use_deinterlace = True
         return {'FINISHED'}
 
+
+class SequencerSelectTimeCursor(bpy.types.Operator):
+    """Select strips under time cursor"""
+    
+    bl_idname = "sequencer.select_time_cursor"
+    bl_label = "Select Time Cursor"
+    bl_options = {"REGISTER", "UNDO"}
+    
+    all=bpy.props.BoolProperty()
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.area.type=='SEQUENCE_EDITOR' and bpy.context.scene.sequence_editor is not None
+
+    def execute(self, context):
+        scn=bpy.context.scene
+        cf=scn.frame_current
+        active=''
+        all=True
+     
+        for s in scn.sequence_editor.sequences_all:
+            s.select=False
+            s.select_left_handle=False
+            s.select_right_handle=False
+            
+        playing=[] 
+        for i in range(32,0,-1):
+            for s in scn.sequence_editor.sequences_all:
+                if s.frame_final_start<=cf and s.frame_final_end > cf and s.channel==i:
+                    playing.append(s)
+                    
+        if len(playing)!=0:
+            for s in playing:
+                if s.mute==False and active=='':
+                    active=s
+                if all==True:
+                    s.select=True
+                else:
+                    if active!='':
+                        active.select=True
+        if active!='':
+            scn.sequence_editor.active_strip=active
+            
+        return {"FINISHED"}     
+
+class SequencerSelectChannel(Operator):
+    """Add Entire Channel to Selection"""
+
+    bl_idname = "sequencer.select_channel"
+    bl_label = "Select Channel"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene and context.scene.sequence_editor)
+
+    def execute(self, context):
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+
+        selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
+
+        sequences = bpy.context.scene.sequence_editor.sequences_all
+        
+        for s in selection:
+            for strip in sequences:        
+                if s.channel == strip.channel:      
+                    strip.select = strip.channel == s.channel
+                    
+        return {'FINISHED'}        
+        
 classes = (
     SequencerCrossfadeSounds,
     SequencerCutMulticam,
     SequencerDeinterlaceSelectedMovies,
     SequencerRippleDelete,
+    SequencerSelectTimeCursor,
+    SequencerSelectChannel,
 )
