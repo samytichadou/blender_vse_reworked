@@ -1,8 +1,3 @@
-####################
-#SEQUENCER REWORKED#
-####################
-#version3
-
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
 #  This program is free software; you can redistribute it and/or
@@ -91,6 +86,10 @@ class SequencerRippleDelete(bpy.types.Operator):
     def poll(cls, context):
         return context.scene.sequence_editor.active_strip != None
 
+    @classmethod
+    def poll(cls, context):
+        return context.scene.sequence_editor.active_strip != None
+
     def execute(self, context):
         seq = context.scene.sequence_editor.active_strip
         distance = (seq.frame_final_end - seq.frame_final_start)
@@ -115,9 +114,15 @@ class SequencerRippleDelete(bpy.types.Operator):
         else: list.sort(seqs,key=lambda x:x.frame_final_start)
 
         for s in seqs:
-            s.frame_start += distance       
+            if s.type not in {
+            'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+            'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+            'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+            'GAUSSIAN_BLUR', 'TEXT',
+            }:
+                s.frame_start += distance                   
 
-        return {'FINISHED'}       
+        return {'FINISHED'}          
         
         
 class SequencerCutMulticam(Operator):
