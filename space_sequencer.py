@@ -312,11 +312,11 @@ class SEQUENCER_MT_select_all_menu(Menu):
     def draw(self, context):
         layout = self.layout
         
-        layout.operator("sequencer.select_all", text="Both", icon = "ARROW_LEFTRIGHT").action = 'SELECT' 
-        props = layout.operator("sequencer.select", text="Left", icon = "BACK")
+        layout.operator("sequencer.select_all", text="Over").action = 'SELECT' 
+        props = layout.operator("sequencer.select", text="Left")
         props.left_right = 'LEFT'
         props.linked_time = True
-        props = layout.operator("sequencer.select", text="Right", icon = "FORWARD")
+        props = layout.operator("sequencer.select", text="Right")
         props.left_right = 'RIGHT'
         props.linked_time = True       
 
@@ -327,9 +327,9 @@ class SEQUENCER_MT_select_handle(Menu):
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("sequencer.select_handles", text="Both", icon = "ARROW_LEFTRIGHT").side = 'BOTH' 
-        layout.operator("sequencer.select_handles", text="Left", icon = "BACK").side = 'LEFT'
-        layout.operator("sequencer.select_handles", text="Right", icon = "FORWARD").side = 'RIGHT'
+        layout.operator("sequencer.select_handles", text="Both").side = 'BOTH' 
+        layout.operator("sequencer.select_handles", text="Left").side = 'LEFT'
+        layout.operator("sequencer.select_handles", text="Right").side = 'RIGHT'
        
 
 class SEQUENCER_MT_select_channel(Menu):
@@ -338,9 +338,9 @@ class SEQUENCER_MT_select_channel(Menu):
     def draw(self, context):
         layout = self.layout
         
-        layout.operator("sequencer.select_channel", text="Both", icon = "ARROW_LEFTRIGHT")         
-        layout.operator("sequencer.select_active_side", text="Left", icon = "BACK").side = 'LEFT'
-        layout.operator("sequencer.select_active_side", text="Right", icon = "FORWARD").side = 'RIGHT'
+        layout.operator("sequencer.select_channel", text="All")         
+        layout.operator("sequencer.select_active_side", text="Left").side = 'LEFT'
+        layout.operator("sequencer.select_active_side", text="Right").side = 'RIGHT'
         
 
 class SEQUENCER_MT_select(Menu):
@@ -707,8 +707,7 @@ class SEQUENCER_MT_strip(Menu):
 
                 layout.separator()
 
-                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")                
-
+                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")                               
             elif stype in {'MOVIE'}:
                 
                 layout.separator()               
@@ -754,7 +753,11 @@ class SEQUENCER_MT_strip(Menu):
                     layout.prop(strip, "show_waveform")
                                 
         layout.separator()
-
+        
+        layout.operator("sequencer.toggle_all_modifiers", text ="Toggle Modifiers")
+                                
+        layout.separator()
+                
         layout.operator("sequencer.offset_clear")
         layout.operator("sequencer.rebuild_proxy")
 
