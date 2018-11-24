@@ -1,4 +1,4 @@
-# blender_vse_reworked
+# BLENDER VIDEO SEQUENCE EDITOR - REWORKED
 
 A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 
