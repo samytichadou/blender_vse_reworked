@@ -308,7 +308,67 @@ class SequencerSelectChannel(Operator):
                     strip.select = strip.channel == s.channel
                     
         return {'FINISHED'}        
-        
+ 
+import bpy
+
+class SequencerSelectAllLockedStrips(bpy.types.Operator):
+    '''Selects all locked strips'''
+    bl_idname = "sequencer.select_all_locked_strips"
+    bl_label = "Select All Locked Strips"
+    bl_description = "Selects all locked strips"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        lockedStrips = []
+        for strip in bpy.context.sequences:
+            if strip.lock:
+                lockedStrips.append(strip)
+        try:
+            if lockedStrips != []:
+                bpy.ops.sequencer.select_all(action='DESELECT')
+                for strip in lockedStrips:
+                    strip.select = True
+        except:
+            pass
+
+        return {'FINISHED'}
+
+
+class SequencerSelectAllMuteStrips(bpy.types.Operator):
+    '''Selects all mute strips'''
+    bl_idname = "sequencer.select_all_mute_strips"
+    bl_label = "Select All Mute Strips"
+    bl_description = "Selects all mute strips"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        muteStrips = []
+        for strip in bpy.context.sequences:
+            if strip.mute:
+                muteStrips.append(strip)
+        try:
+            if muteStrips != []:
+                bpy.ops.sequencer.select_all(action='DESELECT')
+                for strip in muteStrips:
+                    strip.select = True
+        except:
+            pass
+
+        return {'FINISHED'}
+
+
 classes = (
     SequencerCrossfadeSounds,
     SequencerCutMulticam,
@@ -319,4 +379,6 @@ classes = (
     SequencerRippleDelete,
     SequencerSelectTimeCursor,
     SequencerSelectChannel,
+    SequencerSelectAllLockedStrips,
+    SequencerSelectAllMuteStrips,
 )
