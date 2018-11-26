@@ -209,11 +209,14 @@ class SEQUENCER_MT_view_zoom(Menu):
     def draw(self, context):
         layout = self.layout
                 
-        #layout.operator("view2d.zoom_in", text="In") 
-        prop = layout.operator("view2d.zoom_in", text="In")
-        layout.operator("view2d.zoom_out", text="Out")                   
         layout.operator("view2d.zoom_border", text = "Border...")
-
+        prop = layout.operator("view2d.zoom_in", text="Horizontal In")
+        layout.operator("view2d.zoom_out", text="Horizontal Out")         
+        layout.operator_context = "EXEC_REGION_WIN"
+        zoom = layout.operator("view2d.zoom", text="Vertical In")
+        zoom.deltay=0.5       
+        zoom = layout.operator("view2d.zoom", text="Vertical Out")
+        zoom.deltay=-0.5                   
 
 class SEQUENCER_MT_view(Menu):
     bl_label = "View"
