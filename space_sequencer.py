@@ -179,16 +179,16 @@ class SEQUENCER_MT_view_toggle(Menu):
         layout.operator("sequencer.view_toggle").type = 'PREVIEW'
         layout.operator("sequencer.view_toggle").type = 'SEQUENCER_PREVIEW'
 
-class SEQUENCER_MT_view_zoom(Menu):
+class SEQUENCER_MT_preview_zoom(Menu):
     bl_label = "Zoom"
 
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_PREVIEW' 
-        # Missing functions, but breaks the menu:        
-        #layout.operator("view2d.zoom_in", text="Zoom In").delta = 1       
-        #layout.operator("view2d.zoom_out", text="Zoom Out").delta = -1        
-        layout.operator("view2d.zoom_border", text = "Zoom to border")
+                
+        layout.operator("view2d.zoom_in", text = "In") 
+        layout.operator("view2d.zoom_out", text = "Out")                   
+        layout.operator("view2d.zoom_border", text = "Border...")
 
         layout.separator()
        
@@ -201,6 +201,19 @@ class SEQUENCER_MT_view_zoom(Menu):
                 translate=False,
             ).ratio = a / b
         layout.operator_context = 'INVOKE_DEFAULT'
+        
+        
+class SEQUENCER_MT_view_zoom(Menu):
+    bl_label = "Zoom"
+
+    def draw(self, context):
+        layout = self.layout
+                
+        #layout.operator("view2d.zoom_in", text="In") 
+        prop = layout.operator("view2d.zoom_in", text="In")
+        layout.operator("view2d.zoom_out", text="Out")                   
+        layout.operator("view2d.zoom_border", text = "Border...")
+
 
 class SEQUENCER_MT_view(Menu):
     bl_label = "View"
@@ -227,10 +240,10 @@ class SEQUENCER_MT_view(Menu):
             layout.operator("sequencer.view_all", text="All Sequences")
             layout.operator("sequencer.view_selected", text="Selected")
             layout.operator("sequencer.view_frame", text="Frame")
-            # Missing functions, but breaks the menu:
-            #layout.operator("view2d.zoom_in", text="Zoom In").delta = 1       
-            #layout.operator("view2d.zoom_out", text="Zoom Out").delta = -1           
-            layout.operator("view2d.zoom_border", text="Zoom Border...")
+            
+            layout.separator()            
+            
+            layout.menu("SEQUENCER_MT_view_zoom")
             layout.operator_context = 'INVOKE_DEFAULT'
             
             layout.separator()
@@ -241,7 +254,7 @@ class SEQUENCER_MT_view(Menu):
 
             layout.separator()
 
-            layout.menu("SEQUENCER_MT_view_zoom")
+            layout.menu("SEQUENCER_MT_preview_zoom")
 
             layout.separator()
 
@@ -764,11 +777,12 @@ class SEQUENCER_MT_strip(Menu):
                 st = context.space_data
                 strip = act_strip(context)
                 sound = strip.sound                                                
-                if st.waveform_display_type == 'DEFAULT_WAVEFORMS':                
+                if st.waveform_display_type == 'DEFAULT_WAVEFORMS': 
+                                   
                     layout.separator()
-
+                    
                     layout.prop(strip, "show_waveform")
-                                
+
         layout.separator()
         
         layout.operator("sequencer.toggle_all_modifiers", text ="Toggle All Modifiers")
@@ -1591,7 +1605,8 @@ classes = (
     SEQUENCER_MT_file,               
     SEQUENCER_MT_view,
     SEQUENCER_MT_view_toggle,
-    SEQUENCER_MT_view_zoom,    
+    SEQUENCER_MT_preview_zoom, 
+    SEQUENCER_MT_view_zoom,       
     SEQUENCER_MT_select_cursor,    
     SEQUENCER_MT_select_handle, 
     SEQUENCER_MT_select_channel,       
