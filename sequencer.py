@@ -84,11 +84,9 @@ class SequencerRippleDelete(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.scene.sequence_editor.active_strip != None
-
-    @classmethod
-    def poll(cls, context):
-        return context.scene.sequence_editor.active_strip != None
+        if context.sequences:
+            return True
+        return False
 
     def execute(self, context):
         seq = context.scene.sequence_editor.active_strip
@@ -308,7 +306,112 @@ class SequencerSelectChannel(Operator):
                     strip.select = strip.channel == s.channel
                     
         return {'FINISHED'}        
+ 
+import bpy
+
+class SequencerSelectAllLockedStrips(bpy.types.Operator):
+    '''Select all locked strips'''
+    bl_idname = "sequencer.select_all_locked_strips"
+    bl_label = "Select All Locked Strips"
+    bl_description = "Select all locked strips"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        lockedStrips = []
+        for strip in bpy.context.sequences:
+            if strip.lock:
+                lockedStrips.append(strip)
+        try:
+            if lockedStrips != []:
+                bpy.ops.sequencer.select_all(action='DESELECT')
+                for strip in lockedStrips:
+                    strip.select = True
+        except:
+            pass
+
+        return {'FINISHED'}
+
+
+class SequencerSelectAllMuteStrips(bpy.types.Operator):
+    '''Select all mute strips'''
+    bl_idname = "sequencer.select_all_mute_strips"
+    bl_label = "Select All Mute Strips"
+    bl_description = "Select all mute strips"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        muteStrips = []
+        for strip in bpy.context.sequences:
+            if strip.mute:
+                muteStrips.append(strip)
+        try:
+            if muteStrips != []:
+                bpy.ops.sequencer.select_all(action='DESELECT')
+                for strip in muteStrips:
+                    strip.select = True
+        except:
+            pass
+
+        return {'FINISHED'}
+
+class SequencerToggleAllModifiers(bpy.types.Operator):
+    '''Toggle all modifiers on/off'''
+    bl_idname = "sequencer.toggle_all_modifiers"
+    bl_label = "Toggle all modifiers"
+    bl_description = "Toggle all modifiers on/off"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    selection_only = bpy.props.BoolProperty(
+        name="Only Selected",
+        default=False,
+        description="Only apply to selected strips")
+
+    showhide = bpy.props.EnumProperty(
+        items = [('show', 'Show', 'Make modifiers visible'),
+                ('hide', 'Hide', 'Make modifiers not visible'),
+                ('toggle', 'Toggle', 'Toggle modifier visilibity per modifier')],
+        name = "show/hide",
+        default="toggle",
+        description = "Show, hide, or toggle all strip modifier")
+
+    def execute(self, context):
+
+        stps = []
+        if self.selection_only==True:
+            stps = [seq for seq in context.scene.sequence_editor.sequences if seq.select]
+        else:
+            stps = context.scene.sequence_editor.sequences
+
+        for stp in stps:
+            for mod in stp.modifiers:
+                if self.showhide=="show":
+                    mod.mute=False
+                elif self.showhide=="hide":
+                    mod.mute=True
+                else:
+                    mod.mute = not mod.mute
+
+        return {'FINISHED'}     
         
+
 classes = (
     SequencerCrossfadeSounds,
     SequencerCutMulticam,
@@ -319,4 +422,7 @@ classes = (
     SequencerRippleDelete,
     SequencerSelectTimeCursor,
     SequencerSelectChannel,
+    SequencerSelectAllLockedStrips,
+    SequencerSelectAllMuteStrips,
+    SequencerToggleAllModifiers,
 )
