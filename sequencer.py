@@ -237,10 +237,10 @@ class SequencerFlipYSelectedMovies(Operator):
 
         
 class SequencerSelectTimeCursor(bpy.types.Operator):
-    """Select strips under time cursor"""
+    """Select strips at current frame"""
     
     bl_idname = "sequencer.select_time_cursor"
-    bl_label = "Select Time Cursor"
+    bl_label = "Select current frame"
     bl_options = {"REGISTER", "UNDO"}
     
     all=bpy.props.BoolProperty()
@@ -410,7 +410,25 @@ class SequencerToggleAllModifiers(bpy.types.Operator):
                     mod.mute = not mod.mute
 
         return {'FINISHED'}     
-        
+ 
+class SequencerAudioMuteToggle(bpy.types.Operator):
+    '''Toggle all modifiers on/off'''
+    bl_idname = "screen.audio_mute_toggle"
+    bl_label = "Audio Mute Toggle"
+    bl_description = "Toggle all audio on/off"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+    
+    def execute(self, context):
+    
+        bpy.context.scene.use_audio = not bpy.context.scene.use_audio
+
+        return {'FINISHED'}  
 
 classes = (
     SequencerCrossfadeSounds,
@@ -425,4 +443,5 @@ classes = (
     SequencerSelectAllLockedStrips,
     SequencerSelectAllMuteStrips,
     SequencerToggleAllModifiers,
+    SequencerAudioMuteToggle,
 )

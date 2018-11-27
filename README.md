@@ -16,6 +16,10 @@ Added or Changed:
 - Un-Mute/Un-Hide Deselected(from menu)
 - Toggle All Modifiers On/Off(new function)
 - Jump to Keyframe/Start/End(from menu)
+- Toggle Audio Icon-Button in Header(new function)
+- Zoom Border...(from menu)
+- Flip X/Y(from menu)
+- Reverse(from menu)
 
 Installation:
 Place the two files included into these paths before starting Blender 2.80:
