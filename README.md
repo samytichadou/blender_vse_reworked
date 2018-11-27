@@ -2,20 +2,21 @@
 
 A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 
-### New function added to the menu:
+### New functions added to the menu:
 
-- Select Strips Under Cursor(new function)
-- Select All Strips in Selected Channel(new function)
-- Select Locked Strips(new function)
-- Select Muted/Hidden Strips(new function)
-- Cut > Extract (Ripple Delete)(new function)
-- Toggle All Modifiers On/Off(new function)
-- Toggle Audio Icon-Button in Header(new function)
+- Select Strips Under Cursor
+- Select All Strips in Selected Channel
+- Select Locked Strips
+- Select Muted/Hidden Strips
+- Cut > Extract (Ripple Delete)
+- Toggle All Modifiers On/Off
+- Toggle Audio Icon-Button in Header
+- Show Waveform in Selected
 - Set Preview Start
 - Set Preview End
 - Set Preview Selected
-- Split Lift Left
-- Split Lift Right
+- Split & Lift Left
+- Split & Lift Right
 
 
 ### Existing functions added to menu:
