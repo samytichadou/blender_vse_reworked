@@ -89,6 +89,11 @@ class SequencerRippleDelete(bpy.types.Operator):
         return False
 
     def execute(self, context):
+        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}        
+        
         seq = context.scene.sequence_editor.active_strip
         distance = (seq.frame_final_end - seq.frame_final_start)
 
@@ -236,11 +241,33 @@ class SequencerFlipYSelectedMovies(Operator):
         return {'FINISHED'}
 
         
+class SequencerShowWaveformSelectedSounds(Operator):
+    """Toggle draw waveform of all selected audio sources"""
+
+    bl_idname = "sequencer.show_waveform_selected_sounds"
+    bl_label = "Show Waveform"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene and context.scene.sequence_editor)
+
+    def execute(self, context):
+
+        for strip in context.scene.sequence_editor.sequences_all:
+            if strip.select and strip.type == 'SOUND':
+                if (strip.show_waveform is False):
+                    strip.show_waveform = True
+                elif (strip.show_waveform is True):
+                    strip.show_waveform = False    
+
+        return {'FINISHED'}     
+        
 class SequencerSelectTimeCursor(bpy.types.Operator):
     """Select strips at current frame"""
     
     bl_idname = "sequencer.select_time_cursor"
-    bl_label = "Select current frame"
+    bl_label = "Select Current Frame"
     bl_options = {"REGISTER", "UNDO"}
     
     all=bpy.props.BoolProperty()
@@ -339,10 +366,10 @@ class SequencerSelectAllLockedStrips(bpy.types.Operator):
 
 
 class SequencerSelectAllMuteStrips(bpy.types.Operator):
-    '''Select all mute strips'''
+    '''Select all muted/hidden strips'''
     bl_idname = "sequencer.select_all_mute_strips"
-    bl_label = "Select All Mute Strips"
-    bl_description = "Select all mute strips"
+    bl_label = "Select All Muted/Hidden"
+    bl_description = "Select all muted/hidden strips"
     bl_options = {"REGISTER", "UNDO"}
 
     @classmethod
@@ -412,7 +439,7 @@ class SequencerToggleAllModifiers(bpy.types.Operator):
         return {'FINISHED'}     
  
 class SequencerAudioMuteToggle(bpy.types.Operator):
-    '''Toggle all modifiers on/off'''
+    '''Toggle audio on/off'''
     bl_idname = "screen.audio_mute_toggle"
     bl_label = "Audio Mute Toggle"
     bl_description = "Toggle all audio on/off"
@@ -430,13 +457,138 @@ class SequencerAudioMuteToggle(bpy.types.Operator):
 
         return {'FINISHED'}  
 
+class SequencerPreviewEndInCurrent(bpy.types.Operator):
+    """Sets preview end to current frame"""
+    bl_idname = "sequencer.preview_end_in_current"
+    bl_label = "Preview End to Current"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        scene = bpy.context.scene
+        # the -1 below is because we want the scene to end where the cursor is
+        # positioned, not one frame after it (as scene.frame_current behaves)
+        scene.frame_end = scene.frame_current - 1
+        scene.frame_preview_end = scene.frame_current - 1
+
+        return {'FINISHED'}
+
+
+class SequencerPreviewStartInCurrent(bpy.types.Operator):
+    """Sets Preview start to current frame"""
+    bl_idname = "sequencer.preview_start_in_current"
+    bl_label = "Preview Start to Current"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        scene = bpy.context.scene
+        scene.frame_start = scene.frame_current
+        scene.frame_preview_start = scene.frame_current
+
+        return {'FINISHED'}
+
+class SequencerPreviewSelected(bpy.types.Operator):
+    """Sets preview range to selected strips"""
+    bl_idname = "sequencer.preview_selected"
+    bl_label = "Preview Selected"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        scene = bpy.context.scene
+        selectedStrips = bpy.context.selected_sequences
+
+        reference = 0
+        for strip in selectedStrips:
+            if strip.frame_final_end > reference:
+                reference = strip.frame_final_end
+
+        for strip in selectedStrips:
+            stripStart = strip.frame_start + strip.frame_offset_start
+            if (stripStart < reference):
+                reference = stripStart
+
+        scene.frame_start = reference
+        scene.frame_preview_start = reference
+
+        for strip in selectedStrips:
+            if (strip.frame_final_end > reference):
+                reference = strip.frame_final_end - 1
+
+        scene.frame_end = reference
+        scene.frame_preview_end = reference
+
+        return {'FINISHED'}
+
+class SequencerSplitExtractLeft(bpy.types.Operator):
+    """Splits selected strips and extracts to the left"""
+    bl_idname = "sequencer.split_extract_left"
+    bl_label = "Split Extract Left"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+                
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer
+
+        sequencer.cut(frame=scene.frame_current, type='SOFT', side='LEFT')
+        sequencer.delete()
+
+        return {'FINISHED'}
+
+
+class SequencerSplitExtractRight(bpy.types.Operator):
+    """Splits selected strip and extracts to the right"""
+    bl_idname = "sequencer.split_extract_right"
+    bl_label = "Split Extract Right"
+    bl_options = {'REGISTER', 'UNDO'}
+    # Shortcut: Alt + K
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+        
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer
+
+        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
+        sequencer.delete()
+
+        return {'FINISHED'}
+
+
 classes = (
     SequencerCrossfadeSounds,
     SequencerCutMulticam,
     SequencerDeinterlaceSelectedMovies,
     SequencerReverseSelectedMovies,
     SequencerFlipXSelectedMovies,
-    SequencerFlipYSelectedMovies,   
+    SequencerFlipYSelectedMovies,
+    SequencerShowWaveformSelectedSounds,
     SequencerRippleDelete,
     SequencerSelectTimeCursor,
     SequencerSelectChannel,
@@ -444,4 +596,9 @@ classes = (
     SequencerSelectAllMuteStrips,
     SequencerToggleAllModifiers,
     SequencerAudioMuteToggle,
+    SequencerPreviewStartInCurrent,
+    SequencerPreviewEndInCurrent,
+    SequencerPreviewSelected,
+    SequencerSplitExtractLeft,
+    SequencerSplitExtractRight,
 )
