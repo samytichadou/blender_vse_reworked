@@ -99,7 +99,7 @@ class SEQUENCER_HT_header(Header):
 
             layout.operator( "screen.audio_mute_toggle", text = "", icon = icon )  
             
-            layout.operator("sequencer.refresh_all", icon="FILE_REFRESH", text="")                      
+            layout.operator("sequencer.refresh_all", icon="FILE_REFRESH", text="")        
 
         if st.view_type in {'PREVIEW', 'SEQUENCER_PREVIEW'}:
             layout.prop(st, "display_mode", text="", icon_only=True)
@@ -210,6 +210,9 @@ class SEQUENCER_MT_view_zoom(Menu):
         layout = self.layout
                 
         layout.operator("view2d.zoom_border", text = "Border...")
+        
+        layout.separator()
+       
         prop = layout.operator("view2d.zoom_in", text="Horizontal In")
         layout.operator("view2d.zoom_out", text="Horizontal Out")         
         layout.operator_context = "EXEC_REGION_WIN"
@@ -463,6 +466,28 @@ class SEQUENCER_MT_navigation_jump_to(Menu):
         props = layout.operator("screen.frame_jump", text="End", icon = "FF")
         props.end = True
 
+        layout.separator()
+        
+        props = layout.operator("screen.frame_offset", text="Previous frame")
+        props.delta = -1
+        props = layout.operator("screen.frame_offset", text="Next Frame")
+        props.delta = 1
+
+class SEQUENCER_MT_navigation_preview(Menu):
+    bl_label = "Preview Range"
+
+    def draw(self, context):
+        layout = self.layout
+        
+        layout.operator("anim.previewrange_set", text = "Set Box...")
+        layout.operator("anim.previewrange_clear", text = "Clear Box") 
+
+        layout.separator()              
+                
+        layout.operator("sequencer.preview_selected", text = "Selected")
+        layout.operator("sequencer.preview_start_in_current", text = "Set Start")
+        layout.operator("sequencer.preview_end_in_current", text = "Set End")
+   
 
 class SEQUENCER_MT_navigation(Menu):
     bl_label = "Navigation"
@@ -476,8 +501,11 @@ class SEQUENCER_MT_navigation(Menu):
 
         layout.separator()              
 
-        layout.operator("anim.previewrange_set")
+        layout.menu("SEQUENCER_MT_navigation_preview")        
+        '''layout.operator("anim.previewrange_set")
         layout.operator("anim.previewrange_clear")
+        layout.operator("sequencer.preview_start_in_current", text = "Set Preview Start")
+        layout.operator("sequencer.preview_end_in_current", text = "Set Preview End")'''
 
         layout.separator()
        
@@ -617,7 +645,6 @@ class SEQUENCER_MT_cut(Menu):
         layout.operator("sequencer.cut", text="Soft").type = 'SOFT'
         layout.operator("sequencer.cut", text="Hard").type = 'HARD'
 
-
 class SEQUENCER_MT_remove(Menu):
     bl_label = "Cut"
 
@@ -626,6 +653,15 @@ class SEQUENCER_MT_remove(Menu):
 
         layout.operator("sequencer.delete", text = "Lift")     
         layout.operator("sequencer.ripple_delete", text="Extract")
+
+class SEQUENCER_MT_edit_split_extract(Menu):
+    bl_label = "Split Lift"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("sequencer.split_extract_left", text="Left")
+        layout.operator("sequencer.split_extract_right", text="Right")
+
 
 class SEQUENCER_MT_edit(Menu):
     bl_label = "Edit"
@@ -636,6 +672,7 @@ class SEQUENCER_MT_edit(Menu):
         layout.operator_context = 'INVOKE_REGION_WIN'
 
         layout.menu("SEQUENCER_MT_cut")
+        layout.menu("SEQUENCER_MT_edit_split_extract")
         
         layout.separator()
 
@@ -784,7 +821,8 @@ class SEQUENCER_MT_strip(Menu):
                                    
                     layout.separator()
                     
-                    layout.prop(strip, "show_waveform")
+                    #layout.prop(strip, "show_waveform") # only for active strip, but with checkbox.
+                    layout.operator("sequencer.show_waveform_selected_sounds", text = "Toggle Draw Waveform")
 
         layout.separator()
         
@@ -1602,7 +1640,8 @@ classes = (
     SEQUENCER_MT_editor_menus,
     SEQUENCER_MT_edit,
     SEQUENCER_MT_transform,
-    SEQUENCER_MT_edit_input, 
+    SEQUENCER_MT_edit_input,
+    SEQUENCER_MT_edit_split_extract,     
     SEQUENCER_MT_cut, 
     SEQUENCER_MT_remove, 
     SEQUENCER_MT_file,               
@@ -1617,6 +1656,7 @@ classes = (
     SEQUENCER_MT_marker,
     SEQUENCER_MT_navigation,
     SEQUENCER_MT_navigation_jump_to,
+    SEQUENCER_MT_navigation_preview,
     SEQUENCER_MT_add,
     SEQUENCER_MT_add_effect,
     SEQUENCER_MT_add_transitions,
