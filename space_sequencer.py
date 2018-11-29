@@ -243,9 +243,9 @@ class SEQUENCER_MT_view(Menu):
 
         if is_sequencer_view:
             layout.operator_context = 'INVOKE_REGION_WIN'
+            layout.operator("sequencer.view_selected", text="Frame Selected")            
             layout.operator("sequencer.view_all", text="Frame All")
-            layout.operator("sequencer.view_selected", text="Frame Selected")
-            layout.operator("sequencer.view_frame", text="Frame")
+            layout.operator("sequencer.view_frame", text="Frame Playhead")
             
             layout.separator()            
             
@@ -348,7 +348,7 @@ class SEQUENCER_MT_edit_input(Menu):
 
 
 class SEQUENCER_MT_select_cursor(Menu):
-    bl_label = "Select Time Cursor"
+    bl_label = "Select Playhead"
 
     def draw(self, context):
         layout = self.layout
@@ -394,7 +394,7 @@ class SEQUENCER_MT_select(Menu):
 
         layout.separator()
 
-        layout.menu("SEQUENCER_MT_select_cursor", text ="Cursor")         
+        layout.menu("SEQUENCER_MT_select_cursor", text ="Playhead")         
         layout.menu("SEQUENCER_MT_select_handle", text ="Handle") 
         layout.menu("SEQUENCER_MT_select_channel", text ="Channel")
 
