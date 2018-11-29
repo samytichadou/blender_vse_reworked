@@ -161,12 +161,12 @@ class SEQUENCER_MT_file(Menu):
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("render.opengl", text="Sequence Render Image", icon='RENDER_STILL').sequencer = True
-        props = layout.operator("render.opengl", text="Sequence Render Animation", icon='RENDER_ANIMATION')
+        layout.operator("render.opengl", text="Viewport Render Image", icon='RENDER_STILL').sequencer = True
+        props = layout.operator("render.opengl", text="Viewport Render Animation", icon='RENDER_ANIMATION')
         props.animation = True
         props.sequencer = True
         layout.separator()        
-        layout.operator("sound.mixdown", text="Sequence Render Audio", icon='FILE_SOUND')        
+        layout.operator("sound.mixdown", text="Audio", icon='FILE_SOUND')        
 
 
 class SEQUENCER_MT_view_toggle(Menu):
@@ -243,8 +243,8 @@ class SEQUENCER_MT_view(Menu):
 
         if is_sequencer_view:
             layout.operator_context = 'INVOKE_REGION_WIN'
-            layout.operator("sequencer.view_all", text="All Sequences")
-            layout.operator("sequencer.view_selected", text="Selected")
+            layout.operator("sequencer.view_all", text="Frame All")
+            layout.operator("sequencer.view_selected", text="Frame Selected")
             layout.operator("sequencer.view_frame", text="Frame")
             
             layout.separator()            
