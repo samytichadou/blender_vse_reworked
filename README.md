@@ -36,12 +36,20 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 ### Installation:
 
 Download and place the two files included into these paths before starting Blender 2.80:
-https://github.com/tin2tin/blender_vse_reworked/raw/master/sequencer.py
-- 2.80\scripts\startup\bl_operators\sequencer.py
 
-https://github.com/tin2tin/blender_vse_reworked/raw/master/space_sequencer.py
-- 2.80\scripts\startup\bl_ui\space_sequencer.py
+Download: https://github.com/tin2tin/blender_vse_reworked/raw/master/sequencer.py
 
+Overwrite this file: 2.80\scripts\startup\bl_operators\sequencer.py
+
+
+Download: https://github.com/tin2tin/blender_vse_reworked/raw/master/space_sequencer.py
+
+Overwrite this file: 2.80\scripts\startup\bl_ui\space_sequencer.py
+
+
+Download: https://raw.githubusercontent.com/tin2tin/blender_vse_reworked/master/vse_keymap.blend.py
+
+Import the keymap: Edit > Settings... > Input > Import Key Configuration 
 
 ### Contribute:
 
