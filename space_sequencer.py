@@ -485,8 +485,8 @@ class SEQUENCER_MT_navigation_preview(Menu):
         layout.separator()              
                 
         layout.operator("sequencer.preview_selected", text = "Selected")
-        layout.operator("sequencer.preview_start_in_current", text = "Set Start")
-        layout.operator("sequencer.preview_end_in_current", text = "Set End")
+        layout.operator("sequencer.preview_start_in_current", text = "Set In")
+        layout.operator("sequencer.preview_end_in_current", text = "Set Out")
    
 
 class SEQUENCER_MT_navigation(Menu):
