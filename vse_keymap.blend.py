@@ -485,6 +485,8 @@ keyconfig_data = \
        ],
       },
      ),
+    ("sequencer.split_lift_left", {"type": 'K', "value": 'PRESS', "shift": True, "ctrl": True}, None),
+    ("sequencer.split_lift_right", {"type": 'K', "value": 'PRESS', "shift": True, "alt": True}, None),
     ],
    },
   ),
