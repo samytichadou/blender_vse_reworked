@@ -680,11 +680,10 @@ class SEQUENCER_MT_edit(Menu):
         layout.menu("SEQUENCER_MT_remove")         
         layout.operator("sequencer.copy", text="Copy", icon = "COPYDOWN")
         layout.operator("sequencer.paste", text="Paste", icon = "PASTEDOWN")
-        layout.operator("sequencer.duplicate_move")
 
-        #layout.separator()
-        
-        #layout.menu("SEQUENCER_MT_transform")
+        layout.separator()
+                
+        layout.operator("sequencer.duplicate_move")
 
         layout.separator()
        
