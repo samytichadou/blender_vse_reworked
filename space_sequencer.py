@@ -645,6 +645,16 @@ class SEQUENCER_MT_cut(Menu):
         layout.operator("sequencer.cut", text="Soft").type = 'SOFT'
         layout.operator("sequencer.cut", text="Hard").type = 'HARD'
 
+        layout.separator()
+        
+        layout.operator("sequencer.split_extract_left", text="Extract Left")
+        layout.operator("sequencer.split_extract_right", text="Extract Right")        
+ 
+        layout.separator()
+        
+        layout.operator("sequencer.split_lift_left", text="Lift Left")
+        layout.operator("sequencer.split_lift_right", text="Lift Right")       
+
 class SEQUENCER_MT_remove(Menu):
     bl_label = "Cut"
 
@@ -653,14 +663,6 @@ class SEQUENCER_MT_remove(Menu):
 
         layout.operator("sequencer.delete", text = "Lift")     
         layout.operator("sequencer.ripple_delete", text="Extract")
-
-class SEQUENCER_MT_edit_split_extract(Menu):
-    bl_label = "Split Lift"
-
-    def draw(self, context):
-        layout = self.layout
-        layout.operator("sequencer.split_extract_left", text="Left")
-        layout.operator("sequencer.split_extract_right", text="Right")
 
 
 class SEQUENCER_MT_edit(Menu):
@@ -672,7 +674,6 @@ class SEQUENCER_MT_edit(Menu):
         layout.operator_context = 'INVOKE_REGION_WIN'
 
         layout.menu("SEQUENCER_MT_cut")
-        layout.menu("SEQUENCER_MT_edit_split_extract")
         
         layout.separator()
 
@@ -1640,8 +1641,7 @@ classes = (
     SEQUENCER_MT_editor_menus,
     SEQUENCER_MT_edit,
     SEQUENCER_MT_transform,
-    SEQUENCER_MT_edit_input,
-    SEQUENCER_MT_edit_split_extract,     
+    SEQUENCER_MT_edit_input,    
     SEQUENCER_MT_cut, 
     SEQUENCER_MT_remove, 
     SEQUENCER_MT_file,               
