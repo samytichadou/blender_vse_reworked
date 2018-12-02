@@ -36,12 +36,20 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 ### Installation:
 
 Download and place the two files included into these paths before starting Blender 2.80:
-https://github.com/tin2tin/blender_vse_reworked/raw/master/sequencer.py
-- 2.80\scripts\startup\bl_operators\sequencer.py
 
-https://github.com/tin2tin/blender_vse_reworked/raw/master/space_sequencer.py
-- 2.80\scripts\startup\bl_ui\space_sequencer.py
+Download: https://github.com/tin2tin/blender_vse_reworked/raw/master/sequencer.py
 
+Overwrite this file: 2.80\scripts\startup\bl_operators\sequencer.py
+
+
+Download: https://github.com/tin2tin/blender_vse_reworked/raw/master/space_sequencer.py
+
+Overwrite this file: 2.80\scripts\startup\bl_ui\space_sequencer.py
+
+
+Download: https://raw.githubusercontent.com/tin2tin/blender_vse_reworked/master/vse_keymap.blend.py
+
+Import the keymap: Edit > Settings... > Input > Import Key Configuration 
 
 ### Contribute:
 
@@ -55,7 +63,10 @@ https://blendersensei.com/wp-content/uploads/2015/09/Create-Your-Own-Hotkey.jpg
 - Code clean up so it will apply with the Blender 2.80 python code guidelines. Most of the functions originates from other sources, so we need help to make it consistent, bug free and comply with the blender standarts for submittet code.
 
 - If you want to contribute and run the space_sequencer.py from the Blender 2.80
-Text Editor you'll need to also open: "\blender-2.80.0-git.63150511a29-windows64\2.80\scripts\startup\bl_ui\properties_grease_pencil_common.py" in the Text Editor to avoid errors.
+Text Editor you'll need to also open: 
+"\2.80\scripts\startup\bl_ui\properties_grease_pencil_common.py"
+"2.80\scripts\startup\bl_ui\space_time.py"
+in the Text Editor to avoid errors.
 
 
 ### Inspiration:

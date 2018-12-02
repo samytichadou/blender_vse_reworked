@@ -550,7 +550,7 @@ class SequencerSplitExtractLeft(bpy.types.Operator):
         sequencer = bpy.ops.sequencer
 
         sequencer.cut(frame=scene.frame_current, type='SOFT', side='LEFT')
-        sequencer.delete()
+        sequencer.ripple_delete()
 
         return {'FINISHED'}
 
@@ -560,7 +560,56 @@ class SequencerSplitExtractRight(bpy.types.Operator):
     bl_idname = "sequencer.split_extract_right"
     bl_label = "Split Extract Right"
     bl_options = {'REGISTER', 'UNDO'}
-    # Shortcut: Alt + K
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+        
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer
+
+        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
+        sequencer.ripple_delete()
+
+        return {'FINISHED'}
+
+
+class SequencerSplitLiftLeft(bpy.types.Operator):
+    """Splits selected strips and lifts to the left"""
+    bl_idname = "sequencer.split_lift_left"
+    bl_label = "Split Lift Left"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+                
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer
+
+        sequencer.cut(frame=scene.frame_current, type='SOFT', side='LEFT')
+        sequencer.delete()
+
+        return {'FINISHED'}
+
+
+class SequencerSplitLiftRight(bpy.types.Operator):
+    """Splits selected strip and lifts to the right"""
+    bl_idname = "sequencer.split_lift_right"
+    bl_label = "Split Lift Right"
+    bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
     def poll(cls, context):
@@ -601,4 +650,6 @@ classes = (
     SequencerPreviewSelected,
     SequencerSplitExtractLeft,
     SequencerSplitExtractRight,
+    SequencerSplitLiftLeft,
+    SequencerSplitLiftRight,    
 )
