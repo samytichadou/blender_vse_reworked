@@ -155,7 +155,7 @@ class SEQUENCER_MT_editor_menus(Menu):
             layout.menu("SEQUENCER_MT_marker")
             
 
-class SEQUENCER_MT_file(Menu):
+class SEQUENCER_MT_view_render(Menu):
     bl_label = "Render"
 
     def draw(self, context):
@@ -293,13 +293,22 @@ class SEQUENCER_MT_view(Menu):
 
         layout.separator()
         
-        layout.menu("SEQUENCER_MT_file")
+        layout.menu("SEQUENCER_MT_view_render")
 
         layout.separator()
 
         layout.menu("INFO_MT_area")
        
 
+class SEQUENCER_MT_transform_gaps(Menu):
+    bl_label = "Gaps"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.operator("sequencer.gap_remove", text = "Extract Gap").all=False
+        layout.operator("sequencer.gap_remove", text = "Extract All Gaps").all=True        
+        layout.operator("sequencer.gap_insert", text = "Insert Gap")
 
 class SEQUENCER_MT_transform(Menu):
     bl_label = "Transform"
@@ -317,12 +326,12 @@ class SEQUENCER_MT_transform(Menu):
 
         layout.separator()
 
-        layout.operator("sequencer.gap_remove").all=False
-        layout.operator("sequencer.gap_insert")
+        layout.menu("SEQUENCER_MT_transform_gaps")
 
         layout.separator()
         
         layout.operator("sequencer.snap")
+
 
 class SEQUENCER_MT_edit_input(Menu):
     bl_label = "Inputs"
@@ -369,7 +378,7 @@ class SEQUENCER_MT_select_handle(Menu):
 
         layout.operator("sequencer.select_handles", text="Both").side = 'BOTH' 
         layout.operator("sequencer.select_handles", text="Left").side = 'LEFT'
-        layout.operator("sequencer.select_handles", text="Right").side = 'RIGHT'
+        layout.operator("sequencer.select_handles", text="Right").side = 'RIGHT'    
        
 
 class SEQUENCER_MT_select_channel(Menu):
@@ -637,7 +646,7 @@ class SEQUENCER_MT_add_effect(Menu):
         col.enabled = selected_seq != 0
 
 
-class SEQUENCER_MT_cut(Menu):
+class SEQUENCER_MT_edit_split(Menu):
     bl_label = "Split"
 
     def draw(self, context):
@@ -655,7 +664,7 @@ class SEQUENCER_MT_cut(Menu):
         layout.operator("sequencer.split_lift_left", text="Lift Left")
         layout.operator("sequencer.split_lift_right", text="Lift Right")       
 
-class SEQUENCER_MT_remove(Menu):
+class SEQUENCER_MT_edit_remove(Menu):
     bl_label = "Cut"
 
     def draw(self, context):
@@ -673,11 +682,11 @@ class SEQUENCER_MT_edit(Menu):
 
         layout.operator_context = 'INVOKE_REGION_WIN'
 
-        layout.menu("SEQUENCER_MT_cut")
+        layout.menu("SEQUENCER_MT_edit_split")
         
         layout.separator()
 
-        layout.menu("SEQUENCER_MT_remove")         
+        layout.menu("SEQUENCER_MT_edit_remove")         
         layout.operator("sequencer.copy", text="Copy", icon = "COPYDOWN")
         layout.operator("sequencer.paste", text="Paste", icon = "PASTEDOWN")
 
@@ -1638,13 +1647,8 @@ class SEQUENCER_PT_custom_props(SequencerButtonsPanel, PropertyPanel, Panel):
 classes = (
     SEQUENCER_HT_header,
     SEQUENCER_MT_editor_menus,
-    SEQUENCER_MT_edit,
-    SEQUENCER_MT_transform,
-    SEQUENCER_MT_edit_input,    
-    SEQUENCER_MT_cut, 
-    SEQUENCER_MT_remove, 
-    SEQUENCER_MT_file,               
-    SEQUENCER_MT_view,
+    SEQUENCER_MT_view,    
+    SEQUENCER_MT_view_render,               
     SEQUENCER_MT_view_toggle,
     SEQUENCER_MT_preview_zoom, 
     SEQUENCER_MT_view_zoom,       
@@ -1652,18 +1656,24 @@ classes = (
     SEQUENCER_MT_select_handle, 
     SEQUENCER_MT_select_channel,       
     SEQUENCER_MT_select,
-    SEQUENCER_MT_marker,
-    SEQUENCER_MT_navigation,
-    SEQUENCER_MT_navigation_jump_to,
-    SEQUENCER_MT_navigation_preview,
     SEQUENCER_MT_add,
     SEQUENCER_MT_add_effect,
     SEQUENCER_MT_add_transitions,
     SEQUENCER_MT_add_empty,
+    SEQUENCER_MT_edit, 
+    SEQUENCER_MT_edit_input,    
+    SEQUENCER_MT_edit_split, 
+    SEQUENCER_MT_edit_remove,        
+    SEQUENCER_MT_transform,
+    SEQUENCER_MT_transform_gaps,     
     SEQUENCER_MT_strip,
     SEQUENCER_MT_strip_movie,    
     SEQUENCER_MT_strip_input,
     SEQUENCER_MT_strip_mute,
+    SEQUENCER_MT_navigation,
+    SEQUENCER_MT_navigation_jump_to,
+    SEQUENCER_MT_navigation_preview,    
+    SEQUENCER_MT_marker,    
     SEQUENCER_PT_edit,
     SEQUENCER_PT_effect,
     SEQUENCER_PT_input,
@@ -1679,6 +1689,7 @@ classes = (
     SEQUENCER_PT_grease_pencil,
     SEQUENCER_PT_grease_pencil_tools,
     SEQUENCER_PT_custom_props,
+   
 )
 
 if __name__ == "__main__":  # only for live edit.
