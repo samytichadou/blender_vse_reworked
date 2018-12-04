@@ -217,9 +217,9 @@ class SEQUENCER_MT_view_zoom(Menu):
         layout.operator("view2d.zoom_out", text="Horizontal Out")         
         layout.operator_context = "EXEC_REGION_WIN"
         zoom = layout.operator("view2d.zoom", text="Vertical In")
-        zoom.deltay=0.5       
+        zoom.deltay=2       
         zoom = layout.operator("view2d.zoom", text="Vertical Out")
-        zoom.deltay=-0.5                   
+        zoom.deltay=-2                   
 
 class SEQUENCER_MT_view(Menu):
     bl_label = "View"
@@ -330,7 +330,7 @@ class SEQUENCER_MT_transform(Menu):
 
         layout.separator()
         
-        layout.operator("sequencer.snap")
+        layout.operator("sequencer.snap", text = "Snap to Playhead")
 
 
 class SEQUENCER_MT_edit_input(Menu):
