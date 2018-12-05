@@ -216,10 +216,8 @@ class SEQUENCER_MT_view_zoom(Menu):
         prop = layout.operator("view2d.zoom_in", text="Horizontal In")
         layout.operator("view2d.zoom_out", text="Horizontal Out")         
         layout.operator_context = "EXEC_REGION_WIN"
-        zoom = layout.operator("view2d.zoom", text="Vertical In")
-        zoom.deltay=2       
-        zoom = layout.operator("view2d.zoom", text="Vertical Out")
-        zoom.deltay=-2                   
+        layout.operator("sequencer.zoom_vertical_in", text="Vertical In")
+        layout.operator("sequencer.zoom_vertical_out", text="Vertical Out")                       
 
 class SEQUENCER_MT_view(Menu):
     bl_label = "View"
@@ -504,17 +502,13 @@ class SEQUENCER_MT_navigation(Menu):
     def draw(self, context):
         layout = self.layout
         
-        layout.operator("screen.animation_play", text="Toggle Play", icon = "PLAY")  
-        props = layout.operator("screen.animation_play", text="Toggle Play Reverse", icon = "PLAY_REVERSE")
+        layout.operator("screen.animation_play", text="Toggle Play")#, icon = "PLAY")  
+        props = layout.operator("screen.animation_play", text="Toggle Play Reverse")#, icon = "PLAY_REVERSE")
         props.reverse = True        
 
         layout.separator()              
 
         layout.menu("SEQUENCER_MT_navigation_preview")        
-        '''layout.operator("anim.previewrange_set")
-        layout.operator("anim.previewrange_clear")
-        layout.operator("sequencer.preview_start_in_current", text = "Set Preview Start")
-        layout.operator("sequencer.preview_end_in_current", text = "Set Preview End")'''
 
         layout.separator()
        
@@ -670,7 +664,7 @@ class SEQUENCER_MT_edit_remove(Menu):
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("sequencer.delete", text = "Lift")     
+        layout.operator("sequencer.delete_lift", text = "Lift")     
         layout.operator("sequencer.ripple_delete", text="Extract")
 
 
