@@ -622,7 +622,7 @@ class SequencerDeleteLift(bpy.types.Operator):
         if not selection:
             return {'CANCELLED'}        
 
-        bpy.ops.sequencer.copy()
+        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions
         bpy.ops.sequencer.delete()        
 
         return {'FINISHED'} 
@@ -642,7 +642,7 @@ class SequencerRippleDelete(bpy.types.Operator):
 
     def execute(self, context):
 
-        bpy.ops.sequencer.copy()
+        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions
         selection = context.selected_sequences
         selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
         
