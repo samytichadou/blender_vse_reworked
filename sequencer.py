@@ -75,59 +75,8 @@ class SequencerCrossfadeSounds(Operator):
             return {'CANCELLED'}
         
         
-class SequencerRippleDelete(bpy.types.Operator):
-    """Ripple delete strips"""
-    
-    bl_idname = "sequencer.ripple_delete"
-    bl_label = "Ripple Delete Selection"
-    bl_options = {'REGISTER', 'UNDO'}    
 
-    @classmethod
-    def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
-
-    def execute(self, context):
-        
-        selection = bpy.context.selected_sequences
-        if not selection:
-            return {'CANCELLED'}        
-        
-        seq = context.scene.sequence_editor.active_strip
-        distance = (seq.frame_final_end - seq.frame_final_start)
-
-        for s in context.sequences: s.select=False
-        seq.select = True
-        seq_len = (seq.frame_final_end - seq.frame_final_start)
-
-        bpy.ops.sequencer.select_active_side(side='RIGHT')
-        seq.select=False
-        sel_seqs = bpy.context.selected_sequences
-
-        if sel_seqs: bpy.ops.sequencer.select_all(action='TOGGLE')
-
-        seq.select=True
-        bpy.ops.sequencer.delete()
-
-        seqs=sel_seqs
-        distance=-distance
-        
-        if distance >=0: list.sort(seqs, key=lambda x:-x.frame_final_start)
-        else: list.sort(seqs,key=lambda x:x.frame_final_start)
-
-        for s in seqs:
-            if s.type not in {
-            'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
-            'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-            'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-            'GAUSSIAN_BLUR', 'TEXT',
-            }:
-                s.frame_start += distance                   
-
-        return {'FINISHED'}          
-        
-        
+                           
 class SequencerCutMulticam(Operator):
     """Cut multi-cam strip and select camera"""
 
@@ -333,8 +282,7 @@ class SequencerSelectChannel(Operator):
                     strip.select = strip.channel == s.channel
                     
         return {'FINISHED'}        
- 
-import bpy
+    
 
 class SequencerSelectAllLockedStrips(bpy.types.Operator):
     '''Select all locked strips'''
@@ -629,6 +577,160 @@ class SequencerSplitLiftRight(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class SequencerSplitLiftRight(bpy.types.Operator):
+    """Splits selected strip and lifts to the right"""
+    bl_idname = "sequencer.split_lift_right"
+    bl_label = "Split Lift Right"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+        
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer
+
+        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
+        sequencer.delete()
+
+        return {'FINISHED'}
+
+
+class SequencerDeleteLift(bpy.types.Operator):
+    """Lift strips"""
+    
+    bl_idname = "sequencer.delete_lift"
+    bl_label = "Lift Selection"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+
+        selection = context.selected_sequences
+        
+        if not selection:
+            return {'CANCELLED'}        
+
+        bpy.ops.sequencer.copy()
+        bpy.ops.sequencer.delete()        
+
+        return {'FINISHED'} 
+
+class SequencerRippleDelete(bpy.types.Operator):
+    """Ripple Delete strips"""
+    
+    bl_idname = "sequencer.ripple_delete"
+    bl_label = "Ripple Delete Selection"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+
+        bpy.ops.sequencer.copy()
+        selection = context.selected_sequences
+        selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
+        
+        if not selection:
+            return {'CANCELLED'}        
+       
+        
+        for seq in selection:
+            context.scene.sequence_editor.active_strip = seq # set as active or it won't work
+            distance = (seq.frame_final_end - seq.frame_final_start) 
+            print(distance)
+            bpy.ops.sequencer.select_all(action='DESELECT') 
+            seq.select = True
+
+            bpy.ops.sequencer.select_active_side(side='RIGHT') # Select to the right
+            seq.select=False
+            seqs = context.selected_sequences
+
+            bpy.ops.sequencer.select_all(action='DESELECT') # cut only active strip
+            seq.select=True   
+            seq_out= seq.frame_final_end      
+            bpy.ops.sequencer.delete()
+
+
+            seqs = sorted(seqs, key=attrgetter('channel', 'frame_final_start'))
+            
+            # delete effect strips(dissolves) if they are adjoind the active strip:
+            if len(seqs)-1 > 1:
+                if seqs[1].type in {
+                'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+                'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+                'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+                'GAUSSIAN_BLUR', 'TEXT',
+                }:    
+                    seqs[1].select=True  
+                    #distance = distance + (seqs[1].frame_final_duration) # can't get the duration of the transition?         
+                    bpy.ops.sequencer.delete()                                
+
+            distance=-distance
+            
+            for s in seqs:
+                if s.type not in {
+                'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+                'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+                'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+                'GAUSSIAN_BLUR', 'TEXT',
+                }:
+                    s.frame_start += distance                   
+
+        return {'FINISHED'}  
+
+class SequencerZoomVerticalIn(bpy.types.Operator):
+    """Zoom Vertical In"""
+    
+    bl_idname = "sequencer.zoom_vertical_in"
+    bl_label = "Zoom Vertical In"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+      
+        bpy.ops.view2d.zoom(deltay=1)      
+
+        return {'FINISHED'} 
+
+class SequencerZoomVerticalOut(bpy.types.Operator):
+    """Zoom Vertical Out"""
+    
+    bl_idname = "sequencer.zoom_vertical_out"
+    bl_label = "Zoom Vertical Out"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+      
+        bpy.ops.view2d.zoom(deltay=-1)      
+
+        return {'FINISHED'} 
 
 classes = (
     SequencerCrossfadeSounds,
@@ -638,7 +740,6 @@ classes = (
     SequencerFlipXSelectedMovies,
     SequencerFlipYSelectedMovies,
     SequencerShowWaveformSelectedSounds,
-    SequencerRippleDelete,
     SequencerSelectTimeCursor,
     SequencerSelectChannel,
     SequencerSelectAllLockedStrips,
@@ -651,5 +752,9 @@ classes = (
     SequencerSplitExtractLeft,
     SequencerSplitExtractRight,
     SequencerSplitLiftLeft,
-    SequencerSplitLiftRight,    
+    SequencerSplitLiftRight, 
+    SequencerDeleteLift, 
+    SequencerRippleDelete, 
+    SequencerZoomVerticalIn,
+    SequencerZoomVerticalOut,       
 )
