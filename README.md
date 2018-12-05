@@ -17,6 +17,9 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 - Set Preview Selected
 - Split & Lift Left
 - Split & Lift Right
+- Split & Extract Left
+- Split & Extract Right
+- Zoom X/Y
 
 
 ### Existing functions added to menu:
@@ -27,13 +30,16 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 - Divided them into shorter menus.
 - Toggle Meta Strips
 - Un-Mute/Un-Hide Deselected
-- Jump to Keyframe/Start/End)
+- Jump to Keyframe/Start/End
 - Zoom Border...
 - Flip X/Y
 - Reverse
+- Remove All Gaps
 
 
 ### Installation:
+
+Video tutorial: youtu.be/nN4xG3FMH-o
 
 Download and place the two files included into these paths before starting Blender 2.80:
 
