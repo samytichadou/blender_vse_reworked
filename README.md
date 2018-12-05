@@ -39,7 +39,7 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 
 ### Installation:
 
-Video tutorial: youtu.be/nN4xG3FMH-o
+Video tutorial: https://youtu.be/nN4xG3FMH-o
 
 Download and place the two files included into these paths before starting Blender 2.80:
 
