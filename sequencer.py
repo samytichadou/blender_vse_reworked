@@ -656,51 +656,49 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
         
         if not selection:
             return {'CANCELLED'}  
-        
-        for seq in selection:      
-            if seq.lock == True:
-                self.report({'ERROR'}, "Can't extract with locked strips in selection")                
-                return {'CANCELLED'} 
                             
         for seq in selection:
-            context.scene.sequence_editor.active_strip = seq # set as active or it won't work
-            distance = (seq.frame_final_end - seq.frame_final_start) 
-            bpy.ops.sequencer.select_all(action='DESELECT') 
-            seq.select = True
+            if seq.lock == False:            
+                context.scene.sequence_editor.active_strip = seq # set as active or it won't work
+                distance = (seq.frame_final_end - seq.frame_final_start) 
+                bpy.ops.sequencer.select_all(action='DESELECT') 
+                seq.select = True
 
-            bpy.ops.sequencer.select_active_side(side='RIGHT') # Select to the right
-            seq.select=False
-            seqs = context.selected_sequences
+                bpy.ops.sequencer.select_active_side(side='RIGHT') # Select to the right
+                seq.select=False
+                seqs = context.selected_sequences
 
-            bpy.ops.sequencer.select_all(action='DESELECT') # cut only active strip
-            seq.select=True   
-            seq_out= seq.frame_final_end      
-            bpy.ops.sequencer.delete()
+                bpy.ops.sequencer.select_all(action='DESELECT') # cut only active strip
+                seq.select=True   
+                seq_out= seq.frame_final_end      
+                bpy.ops.sequencer.delete()
 
-            seqs = sorted(seqs, key=attrgetter('channel', 'frame_final_start'))
-            
-            # delete effect strips(dissolves) if they are adjoind the active strip:
-            if len(seqs)-1 > 1:
-                if seqs[1].type in {
-                'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
-                'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-                'GAUSSIAN_BLUR', 'TEXT',
-                }:    
-                    seqs[1].select=True  
-                    #distance = distance + (seqs[1].frame_final_duration) # can't get the duration of the transition?         
-                    bpy.ops.sequencer.delete()                                
+                seqs = sorted(seqs, key=attrgetter('channel', 'frame_final_start'))
+                
+                # delete effect strips(dissolves) if they are adjoined the active strip:
+                if len(seqs)-1 > 1:
+                    if seqs[1].type in {
+                    'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+                    'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+                    'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+                    'GAUSSIAN_BLUR', 'TEXT',
+                    }:    
+                        seqs[1].select=True  
+                        #distance = distance + (seqs[1].frame_final_duration) # can't get the duration of the transition?         
+                        bpy.ops.sequencer.delete()                                
 
-            distance=-distance
-            
-            for s in seqs:
-                if s.type not in {
-                'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
-                'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-                'GAUSSIAN_BLUR', 'TEXT',
-                }:
-                    s.frame_start += distance                   
+                distance=-distance
+                
+                for s in seqs:
+                    if s.lock == True:
+                        break
+                    if s.type not in {
+                    'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+                    'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+                    'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+                    'GAUSSIAN_BLUR', 'TEXT',
+                    }:
+                        s.frame_start += distance                   
 
         return {'FINISHED'}  
 
