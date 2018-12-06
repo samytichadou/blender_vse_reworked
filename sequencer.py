@@ -628,7 +628,7 @@ class SEQUENCER_OT_DeleteLift(bpy.types.Operator):
         
         if not selection:
             return {'CANCELLED'}        
-
+         
         #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions
         bpy.ops.sequencer.delete()        
 
@@ -743,6 +743,59 @@ class SEQUENCER_OT_ZoomVerticalOut(bpy.types.Operator):
         return {'FINISHED'} 
 
 
+class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
+    """Add full source to empty channel and match frame"""
+    
+    bl_idname = "sequencer.match_frame"
+    bl_label = "Match Frame"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        
+        selection = context.selected_sequences
+        selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
+        
+        if not selection:
+            return {'CANCELLED'}  
+                            
+        for seq in selection: 
+
+            if seq.type not in {
+            'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+            'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+            'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+            'GAUSSIAN_BLUR', 'TEXT',
+            }:
+                 
+                # Find empty channel:
+                sequences = bpy.context.sequences
+                if not sequences:
+                    return 1
+                channels = [s.channel for s in sequences]
+                channels = sorted(list(set(channels)))
+                empty_channel = channels[-1] + 1 
+                
+                # Duplicate strip to first empty channel and clear offsets
+                if empty_channel < 33:
+                    bpy.ops.sequencer.select_all(action='DESELECT')
+                    seq.select = True
+                    context.scene.sequence_editor.active_strip = seq # set as active or it won't work
+                    bpy.ops.sequencer.duplicate_move(SEQUENCER_OT_duplicate={"mode":'TRANSLATION'}, TRANSFORM_OT_seq_slide={"value":(0, empty_channel-seq.channel), "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "release_confirm":False, "use_accurate":False})
+                    bpy.ops.sequencer.offset_clear()
+
+        #re-select previous selection
+        for seq in selection:                
+            seq.select = True
+
+        return {'FINISHED'} 
+
+
 classes = (
     SEQUENCER_OT_CrossfadeSounds,
     SEQUENCER_OT_CutMulticam,
@@ -767,5 +820,6 @@ classes = (
     SEQUENCER_OT_DeleteLift, 
     SEQUENCER_OT_RippleDelete, 
     SEQUENCER_OT_ZoomVerticalIn,
-    SEQUENCER_OT_ZoomVerticalOut,     
+    SEQUENCER_OT_ZoomVerticalOut,
+    SEQUENCER_OT_MatchFrame,     
 )
