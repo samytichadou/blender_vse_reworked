@@ -24,7 +24,7 @@ from operator import attrgetter
 from bpy.props import IntProperty
 
 
-class SequencerCrossfadeSounds(Operator):
+class SEQUENCER_OT_CrossfadeSounds(Operator):
     """Do cross-fading volume animation of two selected sound strips"""
 
     bl_idname = "sequencer.crossfade_sounds"
@@ -74,10 +74,8 @@ class SequencerCrossfadeSounds(Operator):
             self.report({'ERROR'}, "The selected strips don't overlap")
             return {'CANCELLED'}
         
-        
-
-                           
-class SequencerCutMulticam(Operator):
+                                   
+class SEQUENCER_OT_CutMulticam(Operator):
     """Cut multi-cam strip and select camera"""
 
     bl_idname = "sequencer.cut_multicam"
@@ -119,7 +117,7 @@ class SequencerCutMulticam(Operator):
         return {'FINISHED'}
 
 
-class SequencerDeinterlaceSelectedMovies(Operator):
+class SEQUENCER_OT_DeinterlaceSelectedMovies(Operator):
     """Deinterlace all selected movie sources"""
 
     bl_idname = "sequencer.deinterlace_selected_movies"
@@ -136,7 +134,8 @@ class SequencerDeinterlaceSelectedMovies(Operator):
                 s.use_deinterlace = True
         return {'FINISHED'}
 
-class SequencerReverseSelectedMovies(Operator):
+
+class SEQUENCER_OT_ReverseSelectedMovies(Operator):
     """Reverse all selected movie sources"""
 
     bl_idname = "sequencer.reverse_selected_movies"
@@ -154,7 +153,7 @@ class SequencerReverseSelectedMovies(Operator):
         return {'FINISHED'}
         
 
-class SequencerFlipXSelectedMovies(Operator):
+class SEQUENCER_OT_FlipXSelectedMovies(Operator):
     """Flip X of all selected movie sources"""
 
     bl_idname = "sequencer.flip_x_selected_movies"
@@ -172,7 +171,7 @@ class SequencerFlipXSelectedMovies(Operator):
         return {'FINISHED'}
 
 
-class SequencerFlipYSelectedMovies(Operator):
+class SEQUENCER_OT_FlipYSelectedMovies(Operator):
     """Flip Y of all selected movie sources"""
 
     bl_idname = "sequencer.flip_y_selected_movies"
@@ -190,7 +189,7 @@ class SequencerFlipYSelectedMovies(Operator):
         return {'FINISHED'}
 
         
-class SequencerShowWaveformSelectedSounds(Operator):
+class SEQUENCER_OT_ShowWaveformSelectedSounds(Operator):
     """Toggle draw waveform of all selected audio sources"""
 
     bl_idname = "sequencer.show_waveform_selected_sounds"
@@ -211,8 +210,9 @@ class SequencerShowWaveformSelectedSounds(Operator):
                     strip.show_waveform = False    
 
         return {'FINISHED'}     
+
         
-class SequencerSelectTimeCursor(bpy.types.Operator):
+class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
     """Select strips at current frame"""
     
     bl_idname = "sequencer.select_time_cursor"
@@ -256,7 +256,8 @@ class SequencerSelectTimeCursor(bpy.types.Operator):
             
         return {"FINISHED"}     
 
-class SequencerSelectChannel(Operator):
+
+class SEQUENCER_OT_SelectChannel(Operator):
     """Add Entire Channel to Selection"""
 
     bl_idname = "sequencer.select_channel"
@@ -284,7 +285,7 @@ class SequencerSelectChannel(Operator):
         return {'FINISHED'}        
     
 
-class SequencerSelectAllLockedStrips(bpy.types.Operator):
+class SEQUENCER_OT_SelectAllLockedStrips(bpy.types.Operator):
     '''Select all locked strips'''
     bl_idname = "sequencer.select_all_locked_strips"
     bl_label = "Select All Locked Strips"
@@ -313,7 +314,7 @@ class SequencerSelectAllLockedStrips(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SequencerSelectAllMuteStrips(bpy.types.Operator):
+class SEQUENCER_OT_SelectAllMuteStrips(bpy.types.Operator):
     '''Select all muted/hidden strips'''
     bl_idname = "sequencer.select_all_mute_strips"
     bl_label = "Select All Muted/Hidden"
@@ -341,7 +342,8 @@ class SequencerSelectAllMuteStrips(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class SequencerToggleAllModifiers(bpy.types.Operator):
+
+class SEQUENCER_OT_ToggleAllModifiers(bpy.types.Operator):
     '''Toggle all modifiers on/off'''
     bl_idname = "sequencer.toggle_all_modifiers"
     bl_label = "Toggle all modifiers"
@@ -385,8 +387,9 @@ class SequencerToggleAllModifiers(bpy.types.Operator):
                     mod.mute = not mod.mute
 
         return {'FINISHED'}     
+
  
-class SequencerAudioMuteToggle(bpy.types.Operator):
+class SEQUENCER_OT_AudioMuteToggle(bpy.types.Operator):
     '''Toggle audio on/off'''
     bl_idname = "screen.audio_mute_toggle"
     bl_label = "Audio Mute Toggle"
@@ -405,7 +408,8 @@ class SequencerAudioMuteToggle(bpy.types.Operator):
 
         return {'FINISHED'}  
 
-class SequencerPreviewEndInCurrent(bpy.types.Operator):
+
+class SEQUENCER_OT_PreviewEndInCurrent(bpy.types.Operator):
     """Sets preview end to current frame"""
     bl_idname = "sequencer.preview_end_in_current"
     bl_label = "Preview End to Current"
@@ -425,7 +429,7 @@ class SequencerPreviewEndInCurrent(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SequencerPreviewStartInCurrent(bpy.types.Operator):
+class SEQUENCER_OT_PreviewStartInCurrent(bpy.types.Operator):
     """Sets Preview start to current frame"""
     bl_idname = "sequencer.preview_start_in_current"
     bl_label = "Preview Start to Current"
@@ -442,7 +446,8 @@ class SequencerPreviewStartInCurrent(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class SequencerPreviewSelected(bpy.types.Operator):
+
+class SEQUENCER_OT_PreviewSelected(bpy.types.Operator):
     """Sets preview range to selected strips"""
     bl_idname = "sequencer.preview_selected"
     bl_label = "Preview Selected"
@@ -478,7 +483,8 @@ class SequencerPreviewSelected(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class SequencerSplitExtractLeft(bpy.types.Operator):
+
+class SEQUENCER_OT_SplitExtractLeft(bpy.types.Operator):
     """Splits selected strips and extracts to the left"""
     bl_idname = "sequencer.split_extract_left"
     bl_label = "Split Extract Left"
@@ -503,7 +509,7 @@ class SequencerSplitExtractLeft(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SequencerSplitExtractRight(bpy.types.Operator):
+class SEQUENCER_OT_SplitExtractRight(bpy.types.Operator):
     """Splits selected strip and extracts to the right"""
     bl_idname = "sequencer.split_extract_right"
     bl_label = "Split Extract Right"
@@ -528,7 +534,7 @@ class SequencerSplitExtractRight(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SequencerSplitLiftLeft(bpy.types.Operator):
+class SEQUENCER_OT_SplitLiftLeft(bpy.types.Operator):
     """Splits selected strips and lifts to the left"""
     bl_idname = "sequencer.split_lift_left"
     bl_label = "Split Lift Left"
@@ -553,31 +559,7 @@ class SequencerSplitLiftLeft(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SequencerSplitLiftRight(bpy.types.Operator):
-    """Splits selected strip and lifts to the right"""
-    bl_idname = "sequencer.split_lift_right"
-    bl_label = "Split Lift Right"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        return bpy.context.scene is not None
-
-    def execute(self, context):
-        
-        selection = bpy.context.selected_sequences
-        if not selection:
-            return {'CANCELLED'}
-        
-        scene = bpy.context.scene
-        sequencer = bpy.ops.sequencer
-
-        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
-        sequencer.delete()
-
-        return {'FINISHED'}
-
-class SequencerSplitLiftRight(bpy.types.Operator):
+class SEQUENCER_OT_SplitLiftRight(bpy.types.Operator):
     """Splits selected strip and lifts to the right"""
     bl_idname = "sequencer.split_lift_right"
     bl_label = "Split Lift Right"
@@ -602,7 +584,32 @@ class SequencerSplitLiftRight(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SequencerDeleteLift(bpy.types.Operator):
+class SEQUENCER_OT_SplitLiftRight(bpy.types.Operator):
+    """Splits selected strip and lifts to the right"""
+    bl_idname = "sequencer.split_lift_right"
+    bl_label = "Split Lift Right"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+        
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer
+
+        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
+        sequencer.delete()
+
+        return {'FINISHED'}
+
+
+class SEQUENCER_OT_DeleteLift(bpy.types.Operator):
     """Lift strips"""
     
     bl_idname = "sequencer.delete_lift"
@@ -627,7 +634,8 @@ class SequencerDeleteLift(bpy.types.Operator):
 
         return {'FINISHED'} 
 
-class SequencerRippleDelete(bpy.types.Operator):
+
+class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
     """Ripple Delete strips"""
     
     bl_idname = "sequencer.ripple_delete"
@@ -647,13 +655,16 @@ class SequencerRippleDelete(bpy.types.Operator):
         selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
         
         if not selection:
-            return {'CANCELLED'}        
-       
+            return {'CANCELLED'}  
         
+        for seq in selection:      
+            if seq.lock == True:
+                self.report({'ERROR'}, "Can't extract with locked strips in selection")                
+                return {'CANCELLED'} 
+                            
         for seq in selection:
             context.scene.sequence_editor.active_strip = seq # set as active or it won't work
             distance = (seq.frame_final_end - seq.frame_final_start) 
-            print(distance)
             bpy.ops.sequencer.select_all(action='DESELECT') 
             seq.select = True
 
@@ -665,7 +676,6 @@ class SequencerRippleDelete(bpy.types.Operator):
             seq.select=True   
             seq_out= seq.frame_final_end      
             bpy.ops.sequencer.delete()
-
 
             seqs = sorted(seqs, key=attrgetter('channel', 'frame_final_start'))
             
@@ -694,7 +704,8 @@ class SequencerRippleDelete(bpy.types.Operator):
 
         return {'FINISHED'}  
 
-class SequencerZoomVerticalIn(bpy.types.Operator):
+
+class SEQUENCER_OT_ZoomVerticalIn(bpy.types.Operator):
     """Zoom Vertical In"""
     
     bl_idname = "sequencer.zoom_vertical_in"
@@ -713,7 +724,8 @@ class SequencerZoomVerticalIn(bpy.types.Operator):
 
         return {'FINISHED'} 
 
-class SequencerZoomVerticalOut(bpy.types.Operator):
+
+class SEQUENCER_OT_ZoomVerticalOut(bpy.types.Operator):
     """Zoom Vertical Out"""
     
     bl_idname = "sequencer.zoom_vertical_out"
@@ -732,29 +744,30 @@ class SequencerZoomVerticalOut(bpy.types.Operator):
 
         return {'FINISHED'} 
 
+
 classes = (
-    SequencerCrossfadeSounds,
-    SequencerCutMulticam,
-    SequencerDeinterlaceSelectedMovies,
-    SequencerReverseSelectedMovies,
-    SequencerFlipXSelectedMovies,
-    SequencerFlipYSelectedMovies,
-    SequencerShowWaveformSelectedSounds,
-    SequencerSelectTimeCursor,
-    SequencerSelectChannel,
-    SequencerSelectAllLockedStrips,
-    SequencerSelectAllMuteStrips,
-    SequencerToggleAllModifiers,
-    SequencerAudioMuteToggle,
-    SequencerPreviewStartInCurrent,
-    SequencerPreviewEndInCurrent,
-    SequencerPreviewSelected,
-    SequencerSplitExtractLeft,
-    SequencerSplitExtractRight,
-    SequencerSplitLiftLeft,
-    SequencerSplitLiftRight, 
-    SequencerDeleteLift, 
-    SequencerRippleDelete, 
-    SequencerZoomVerticalIn,
-    SequencerZoomVerticalOut,       
+    SEQUENCER_OT_CrossfadeSounds,
+    SEQUENCER_OT_CutMulticam,
+    SEQUENCER_OT_DeinterlaceSelectedMovies,
+    SEQUENCER_OT_ReverseSelectedMovies,
+    SEQUENCER_OT_FlipXSelectedMovies,
+    SEQUENCER_OT_FlipYSelectedMovies,
+    SEQUENCER_OT_ShowWaveformSelectedSounds,
+    SEQUENCER_OT_SelectTimeCursor,
+    SEQUENCER_OT_SelectChannel,
+    SEQUENCER_OT_SelectAllLockedStrips,
+    SEQUENCER_OT_SelectAllMuteStrips,
+    SEQUENCER_OT_ToggleAllModifiers,
+    SEQUENCER_OT_AudioMuteToggle,
+    SEQUENCER_OT_PreviewStartInCurrent,
+    SEQUENCER_OT_PreviewEndInCurrent,
+    SEQUENCER_OT_PreviewSelected,
+    SEQUENCER_OT_SplitExtractLeft,
+    SEQUENCER_OT_SplitExtractRight,
+    SEQUENCER_OT_SplitLiftLeft,
+    SEQUENCER_OT_SplitLiftRight, 
+    SEQUENCER_OT_DeleteLift, 
+    SEQUENCER_OT_RippleDelete, 
+    SEQUENCER_OT_ZoomVerticalIn,
+    SEQUENCER_OT_ZoomVerticalOut,     
 )
