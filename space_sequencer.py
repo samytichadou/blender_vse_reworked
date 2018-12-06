@@ -271,14 +271,14 @@ class SEQUENCER_MT_view(Menu):
             layout.prop(st, "show_backdrop",text="Backdrop")            
             layout.prop(st, "show_strip_offset", text="Offsets")   
 
-            layout.separator()                
+            #layout.separator()                
                      
             layout.prop(st, "show_frame_indicator", text="Frame Number")
             layout.prop(st, "show_seconds", text="Seconds")            
             if context.space_data.show_seconds:
                 layout.prop(context.user_preferences.view, "timecode_style", text="")            
 
-            layout.separator()            
+            #layout.separator()            
 
             layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
 
@@ -833,7 +833,9 @@ class SEQUENCER_MT_strip(Menu):
                                 
         layout.separator()
                 
-        layout.operator("sequencer.offset_clear")
+        #layout.operator("sequencer.offset_clear") #Replaced by match frame
+        layout.operator("sequencer.match_frame")
+       
         layout.operator("sequencer.rebuild_proxy")
 
         layout.separator()
