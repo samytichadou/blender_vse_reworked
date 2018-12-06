@@ -188,7 +188,7 @@ class SEQUENCER_MT_preview_zoom(Menu):
                 
         layout.operator("view2d.zoom_in", text = "In") 
         layout.operator("view2d.zoom_out", text = "Out")                   
-        layout.operator("view2d.zoom_border", text = "Border...")
+        layout.operator("view2d.zoom_border", text = "Box...")
 
         layout.separator()
        
@@ -209,7 +209,7 @@ class SEQUENCER_MT_view_zoom(Menu):
     def draw(self, context):
         layout = self.layout
                 
-        layout.operator("view2d.zoom_border", text = "Border...")
+        layout.operator("view2d.zoom_border", text = "Box...")
         
         layout.separator()
        
@@ -398,6 +398,7 @@ class SEQUENCER_MT_select(Menu):
         layout.operator("sequencer.select_all", text="All").action = 'SELECT'         
         layout.operator("sequencer.select_all", text="None").action = 'DESELECT'
         layout.operator("sequencer.select_all", text="Invert").action = 'INVERT'
+        prop = layout.operator("sequencer.select_box", text = "Box...")
 
         layout.separator()
 
