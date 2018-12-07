@@ -218,6 +218,33 @@ class SEQUENCER_MT_view_zoom(Menu):
         layout.operator_context = "EXEC_REGION_WIN"
         layout.operator("sequencer.zoom_vertical_in", text="Vertical In")
         layout.operator("sequencer.zoom_vertical_out", text="Vertical Out")                       
+        
+class SEQUENCER_MT_view_frame(Menu):
+    bl_label = "Frame"
+
+    def draw(self, context):
+        layout = self.layout        
+
+        layout.operator("sequencer.view_selected", text="Selected")     
+        layout.operator("sequencer.view_all", text="All")
+        layout.operator("sequencer.view_frame", text="Playhead")        
+
+
+class SEQUENCER_MT_view_preview(Menu):
+    bl_label = "Preview Range"
+
+    def draw(self, context):
+        layout = self.layout
+        
+        layout.operator("anim.previewrange_set", text = "Set Box...")
+        layout.operator("anim.previewrange_clear", text = "Clear Box") 
+
+        layout.separator()              
+                
+        layout.operator("sequencer.preview_selected", text = "Selected")
+        layout.operator("sequencer.preview_start_in_current", text = "Set In")
+        layout.operator("sequencer.preview_end_in_current", text = "Set Out")
+
 
 class SEQUENCER_MT_view(Menu):
     bl_label = "View"
@@ -241,16 +268,20 @@ class SEQUENCER_MT_view(Menu):
 
         if is_sequencer_view:
             layout.operator_context = 'INVOKE_REGION_WIN'
-            layout.operator("sequencer.view_selected", text="Frame Selected")            
-            layout.operator("sequencer.view_all", text="Frame All")
-            layout.operator("sequencer.view_frame", text="Frame Playhead")
             
-            layout.separator()            
+            layout.menu("SEQUENCER_MT_view_frame")
+            
+            #layout.separator()            
             
             layout.menu("SEQUENCER_MT_view_zoom")
+            
+            #layout.separator()   
+            
+            layout.menu("SEQUENCER_MT_view_preview")          
+            
             layout.operator_context = 'INVOKE_DEFAULT'
             
-            layout.separator()
+            #layout.separator()
             
         if is_preview:
             layout.operator_context = 'INVOKE_REGION_PREVIEW'
@@ -262,12 +293,17 @@ class SEQUENCER_MT_view(Menu):
 
             layout.separator()
 
-            layout.operator_context = 'INVOKE_DEFAULT'
-
+            layout.operator_context = 'INVOKE_DEFAULT'         
+            
             # # XXX, invokes in the header view
             #layout.operator("sequencer.view_ghost_border", text="Overlay Border")
 
         if is_sequencer_view:
+
+            layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
+
+            layout.separator()               
+
             layout.prop(st, "show_backdrop",text="Backdrop")            
             layout.prop(st, "show_strip_offset", text="Offsets")   
 
@@ -277,10 +313,6 @@ class SEQUENCER_MT_view(Menu):
             layout.prop(st, "show_seconds", text="Seconds")            
             if context.space_data.show_seconds:
                 layout.prop(context.user_preferences.view, "timecode_style", text="")            
-
-            #layout.separator()            
-
-            layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
 
         if is_preview:
             if st.display_mode == 'IMAGE':
@@ -394,11 +426,15 @@ class SEQUENCER_MT_select(Menu):
     bl_label = "Select"
 
     def draw(self, context):
-        layout = self.layout       
+        layout = self.layout    
+
+        prop = layout.operator("sequencer.select_box", text = "Box...")
+
+        layout.separator()           
+
         layout.operator("sequencer.select_all", text="All").action = 'SELECT'         
         layout.operator("sequencer.select_all", text="None").action = 'DESELECT'
         layout.operator("sequencer.select_all", text="Invert").action = 'INVERT'
-        prop = layout.operator("sequencer.select_box", text = "Box...")
 
         layout.separator()
 
@@ -438,11 +474,24 @@ class SEQUENCER_MT_marker(Menu):
             layout.prop(st, "use_marker_sync")
 
 
-class SEQUENCER_MT_navigation_jump_to(Menu):
-    bl_label = "Jump to"
+class SEQUENCER_MT_navigation(Menu):
+    bl_label = "Navigation"
 
     def draw(self, context):
         layout = self.layout
+        
+        layout.operator("screen.animation_play", text="Toggle Play")#, icon = "PLAY")  
+        props = layout.operator("screen.animation_play", text="Toggle Play Reverse")#, icon = "PLAY_REVERSE")
+        props.reverse = True                
+
+        layout.separator()
+        
+        props = layout.operator("screen.frame_offset", text="Previous frame")
+        props.delta = -1
+        props = layout.operator("screen.frame_offset", text="Next Frame")
+        props.delta = 1
+
+        layout.separator()   
 
         props = layout.operator("sequencer.strip_jump", text="Previous Cut")
         props.next = False
@@ -473,47 +522,6 @@ class SEQUENCER_MT_navigation_jump_to(Menu):
         props.end = False
         props = layout.operator("screen.frame_jump", text="End", icon = "FF")
         props.end = True
-
-        layout.separator()
-        
-        props = layout.operator("screen.frame_offset", text="Previous frame")
-        props.delta = -1
-        props = layout.operator("screen.frame_offset", text="Next Frame")
-        props.delta = 1
-
-class SEQUENCER_MT_navigation_preview(Menu):
-    bl_label = "Preview Range"
-
-    def draw(self, context):
-        layout = self.layout
-        
-        layout.operator("anim.previewrange_set", text = "Set Box...")
-        layout.operator("anim.previewrange_clear", text = "Clear Box") 
-
-        layout.separator()              
-                
-        layout.operator("sequencer.preview_selected", text = "Selected")
-        layout.operator("sequencer.preview_start_in_current", text = "Set In")
-        layout.operator("sequencer.preview_end_in_current", text = "Set Out")
-   
-
-class SEQUENCER_MT_navigation(Menu):
-    bl_label = "Navigation"
-
-    def draw(self, context):
-        layout = self.layout
-        
-        layout.operator("screen.animation_play", text="Toggle Play")#, icon = "PLAY")  
-        props = layout.operator("screen.animation_play", text="Toggle Play Reverse")#, icon = "PLAY_REVERSE")
-        props.reverse = True        
-
-        layout.separator()              
-
-        layout.menu("SEQUENCER_MT_navigation_preview")        
-
-        layout.separator()
-       
-        layout.menu("SEQUENCER_MT_navigation_jump_to")
 
 
 class SEQUENCER_MT_add(Menu):
@@ -1659,8 +1667,10 @@ classes = (
     SEQUENCER_MT_view,    
     SEQUENCER_MT_view_render,               
     SEQUENCER_MT_view_toggle,
+    SEQUENCER_MT_view_frame,    
     SEQUENCER_MT_preview_zoom, 
-    SEQUENCER_MT_view_zoom,       
+    SEQUENCER_MT_view_zoom, 
+    SEQUENCER_MT_view_preview,          
     SEQUENCER_MT_select_cursor,    
     SEQUENCER_MT_select_handle, 
     SEQUENCER_MT_select_channel,       
@@ -1680,9 +1690,7 @@ classes = (
     SEQUENCER_MT_strip_input,
     SEQUENCER_MT_strip_mute,
     SEQUENCER_MT_strip_effect,
-    SEQUENCER_MT_navigation,
-    SEQUENCER_MT_navigation_jump_to,
-    SEQUENCER_MT_navigation_preview,    
+    SEQUENCER_MT_navigation,    
     SEQUENCER_MT_marker,    
     SEQUENCER_PT_edit,
     SEQUENCER_PT_effect,
