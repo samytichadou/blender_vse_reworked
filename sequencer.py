@@ -323,9 +323,7 @@ class SEQUENCER_OT_SelectAllMuteStrips(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
+        return bpy.context.scene is not None
 
     def execute(self, context):
         muteStrips = []
@@ -352,9 +350,7 @@ class SEQUENCER_OT_ToggleAllModifiers(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
+        return bpy.context.scene is not None
 
     selection_only = bpy.props.BoolProperty(
         name="Only Selected",
@@ -492,7 +488,9 @@ class SEQUENCER_OT_SplitExtractLeft(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene is not None
+        if context.sequences:
+            return True
+        return False
 
     def execute(self, context):
         
@@ -517,7 +515,9 @@ class SEQUENCER_OT_SplitExtractRight(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene is not None
+        if context.sequences:
+            return True
+        return False
 
     def execute(self, context):
         
@@ -542,7 +542,9 @@ class SEQUENCER_OT_SplitLiftLeft(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene is not None
+        if context.sequences:
+            return True
+        return False
 
     def execute(self, context):
         
@@ -567,7 +569,9 @@ class SEQUENCER_OT_SplitLiftRight(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene is not None
+        if context.sequences:
+            return True
+        return False
 
     def execute(self, context):
         
@@ -592,7 +596,9 @@ class SEQUENCER_OT_SplitLiftRight(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene is not None
+        if context.sequences:
+            return True
+        return False
 
     def execute(self, context):
         
@@ -717,9 +723,7 @@ class SEQUENCER_OT_ZoomVerticalIn(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
+        return bpy.context.scene is not None
 
     def execute(self, context):
       
@@ -737,9 +741,7 @@ class SEQUENCER_OT_ZoomVerticalOut(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
+        return bpy.context.scene is not None
 
     def execute(self, context):
       
@@ -757,9 +759,7 @@ class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
+        return bpy.context.scene is not None
 
     def execute(self, context):
         
@@ -810,9 +810,7 @@ class SEQUENCER_OT_SplitSoft(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
+        return bpy.context.scene is not None
 
     def execute(self, context):
         selection = context.selected_sequences
