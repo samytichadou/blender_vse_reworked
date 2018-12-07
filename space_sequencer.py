@@ -646,8 +646,10 @@ class SEQUENCER_MT_edit_split(Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("sequencer.cut", text="Soft").type = 'SOFT'
-        layout.operator("sequencer.cut", text="Hard").type = 'HARD'
+        #layout.operator("sequencer.cut", text="Soft").type = 'SOFT'
+        #layout.operator("sequencer.cut", text="Hard").type = 'HARD'
+        layout.operator("sequencer.split_soft", text="Soft")        
+        layout.operator("sequencer.split_hard", text="Hard")
 
         layout.separator()
         
@@ -742,6 +744,19 @@ class SEQUENCER_MT_strip_mute(Menu):
         layout.operator("sequencer.unmute", text="Un-Mute/Un-Hide").unselected = False
         layout.operator("sequencer.mute", text="Mute/Hide Deselected").unselected = True
         layout.operator("sequencer.unmute", text="Un-Mute/Un-Hide Deselected").unselected = True
+        
+        
+class SEQUENCER_MT_strip_effect(Menu):
+    bl_label = "Effect"
+
+    def draw(self, context):
+        layout = self.layout
+                
+        layout.operator_menu_enum("sequencer.change_effect_input", "swap")
+        layout.operator_menu_enum("sequencer.change_effect_type", "type")
+        layout.operator("sequencer.reassign_inputs")
+        layout.operator("sequencer.swap_inputs")        
+
 
 class SEQUENCER_MT_strip(Menu):
     bl_label = "Strip"
@@ -778,10 +793,7 @@ class SEQUENCER_MT_strip(Menu):
 
                 layout.separator()
                 
-                layout.operator_menu_enum("sequencer.change_effect_input", "swap")
-                layout.operator_menu_enum("sequencer.change_effect_type", "type")
-                layout.operator("sequencer.reassign_inputs")
-                layout.operator("sequencer.swap_inputs")
+                layout.menu("SEQUENCER_MT_strip_effect") 
 
                 layout.separator()
 
@@ -1667,6 +1679,7 @@ classes = (
     SEQUENCER_MT_strip_movie,    
     SEQUENCER_MT_strip_input,
     SEQUENCER_MT_strip_mute,
+    SEQUENCER_MT_strip_effect,
     SEQUENCER_MT_navigation,
     SEQUENCER_MT_navigation_jump_to,
     SEQUENCER_MT_navigation_preview,    
