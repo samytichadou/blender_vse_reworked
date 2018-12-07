@@ -625,12 +625,17 @@ class SEQUENCER_OT_DeleteLift(bpy.types.Operator):
     def execute(self, context):
 
         selection = context.selected_sequences
-        
+        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions        
         if not selection:
             return {'CANCELLED'}        
-         
-        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions
-        bpy.ops.sequencer.delete()        
+
+        for s in selection:
+            if not s.lock:
+                bpy.ops.sequencer.select_all(action='DESELECT') 
+                s.select = True
+                bpy.ops.sequencer.delete()  
+                s.select = False                        
+                for s in selection: s.select = True 
 
         return {'FINISHED'} 
 
