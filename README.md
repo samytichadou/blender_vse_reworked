@@ -20,6 +20,9 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 - Split & Extract Left
 - Split & Extract Right
 - Zoom X/Y
+- Match Frame
+- Proper Soft/Hard Split
+- Preserve Locked Strips from split, extract and delete
 
 
 ### Existing functions added to menu:
@@ -35,6 +38,7 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 - Flip X/Y
 - Reverse
 - Remove All Gaps
+- Select Box...
 
 
 ### Installation:
