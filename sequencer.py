@@ -835,14 +835,14 @@ class SEQUENCER_OT_SplitSoft(bpy.types.Operator):
                     bpy.ops.sequencer.select_all(action='DESELECT') 
                     s.select = True
                     bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "SOFT") 
-                    s.select = False                        
+                    bpy.ops.sequencer.select_all(action='DESELECT')                        
                     for s in selection: s.select = True     
                                   
             else:               #cut unselected
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True
                 bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "SOFT") 
-                s.select = False                        
+                bpy.ops.sequencer.select_all(action='DESELECT')                       
                 for s in selection: s.select = True         
         return {'FINISHED'}   
 
@@ -881,14 +881,14 @@ class SEQUENCER_OT_SplitHard(bpy.types.Operator):
                     bpy.ops.sequencer.select_all(action='DESELECT') 
                     s.select = True
                     bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "HARD") 
-                    s.select = False                        
+                    bpy.ops.sequencer.select_all(action='DESELECT')                        
                     for s in selection: s.select = True     
                                   
             else:               #cut unselected
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True
                 bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "HARD") 
-                s.select = False                        
+                bpy.ops.sequencer.select_all(action='DESELECT')                       
                 for s in selection: s.select = True          
         return {'FINISHED'} 
 
