@@ -226,33 +226,33 @@ class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
         return bpy.context.area.type=='SEQUENCE_EDITOR' and bpy.context.scene.sequence_editor is not None
 
     def execute(self, context):
-        scn=bpy.context.scene
-        cf=scn.frame_current
-        active=''
-        all=True
-     
-        for s in scn.sequence_editor.sequences_all:
-            s.select=False
-            s.select_left_handle=False
-            s.select_right_handle=False
-            
-        playing=[] 
-        for i in range(32,0,-1):
-            for s in scn.sequence_editor.sequences_all:
-                if s.frame_final_start<=cf and s.frame_final_end > cf and s.channel==i:
-                    playing.append(s)
-                    
-        if len(playing)!=0:
-            for s in playing:
-                if s.mute==False and active=='':
-                    active=s
-                if all==True:
-                    s.select=True
-                else:
-                    if active!='':
-                        active.select=True
-        if active!='':
-            scn.sequence_editor.active_strip=active
+        cFrame = bpy.context.scene.frame_current
+        selStrips = []
+        lockNum = 0                                     
+        lockSelNum = 0                                      
+        reportMessage = ""
+        for strip in bpy.context.sequences:
+            if strip.lock and strip.select:                         
+                lockSelNum += 1
+            try:
+                if strip.frame_final_end >= cFrame:
+                    if strip.frame_final_start <= cFrame:
+                        if strip.lock and not strip.select:
+                            lockNum += 1
+                        else:
+                            strip.select=True               
+                            selStrips.append(strip)
+            except:
+                pass
+        if selStrips != []:
+            for strip in selStrips:
+                try:
+                    if strip.frame_final_end == cFrame:
+                        strip.select_right_handle = True
+                    elif strip.frame_final_start == cFrame:
+                        strip.select_left_handle = True
+                except:
+                    pass
             
         return {"FINISHED"}     
 
