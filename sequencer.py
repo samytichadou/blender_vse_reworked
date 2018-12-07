@@ -796,6 +796,98 @@ class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
         return {'FINISHED'} 
 
 
+class SEQUENCER_OT_SplitSoft(bpy.types.Operator):
+    """Split Unlocked Un/Seleted Strips Soft"""
+    
+    bl_idname = "sequencer.split_soft"
+    bl_label = "Split Soft"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        selection = context.selected_sequences
+        sequences = bpy.context.scene.sequence_editor.sequences_all
+        cf = bpy.context.scene.frame_current
+        at_cursor = [] 
+        cut_selected = False
+
+        #find unlocked strips at cursor 
+        for s in sequences:
+            if s.frame_final_start<=cf and s.frame_final_end > cf:
+                if s.lock == False:
+                    at_cursor.append(s)
+                    if s.select == True: 
+                        cut_selected = True
+
+        for s in at_cursor:
+            if cut_selected: 
+                if s.select:    #only cut selected  
+                    bpy.ops.sequencer.select_all(action='DESELECT') 
+                    s.select = True
+                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "SOFT") 
+                    s.select = False                        
+                    for s in selection: s.select = True     
+                                  
+            else:               #cut unselected
+                bpy.ops.sequencer.select_all(action='DESELECT') 
+                s.select = True
+                bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "SOFT") 
+                s.select = False                        
+                for s in selection: s.select = True         
+        return {'FINISHED'}   
+
+
+class SEQUENCER_OT_SplitHard(bpy.types.Operator):
+    """Split Unlocked Un/Seleted Strips Hard"""
+    
+    bl_idname = "sequencer.split_hard"
+    bl_label = "Split Hard"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        selection = context.selected_sequences
+        sequences = bpy.context.scene.sequence_editor.sequences_all
+        cf = bpy.context.scene.frame_current
+        at_cursor = [] 
+        cut_selected = False
+
+        #find unlocked strips at cursor 
+        for s in sequences:
+            if s.frame_final_start<=cf and s.frame_final_end > cf:
+                if s.lock == False:
+                    at_cursor.append(s)
+                    if s.select == True: 
+                        cut_selected = True
+
+        for s in at_cursor:
+            if cut_selected: 
+                if s.select:    #only cut selected  
+                    bpy.ops.sequencer.select_all(action='DESELECT') 
+                    s.select = True
+                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "HARD") 
+                    s.select = False                        
+                    for s in selection: s.select = True     
+                                  
+            else:               #cut unselected
+                bpy.ops.sequencer.select_all(action='DESELECT') 
+                s.select = True
+                bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "HARD") 
+                s.select = False                        
+                for s in selection: s.select = True          
+        return {'FINISHED'} 
+
+
 classes = (
     SEQUENCER_OT_CrossfadeSounds,
     SEQUENCER_OT_CutMulticam,
@@ -821,5 +913,7 @@ classes = (
     SEQUENCER_OT_RippleDelete, 
     SEQUENCER_OT_ZoomVerticalIn,
     SEQUENCER_OT_ZoomVerticalOut,
-    SEQUENCER_OT_MatchFrame,     
+    SEQUENCER_OT_MatchFrame,
+    SEQUENCER_OT_SplitHard,
+    SEQUENCER_OT_SplitSoft,     
 )
