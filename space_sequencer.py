@@ -334,7 +334,8 @@ class SEQUENCER_MT_transform_gaps(Menu):
         layout = self.layout
 
         layout.operator("sequencer.gap_remove", text = "Extract Gap").all=False
-        layout.operator("sequencer.gap_remove", text = "Extract All Gaps").all=True        
+        layout.operator("sequencer.gap_remove", text = "Extract All Gaps").all=True   
+        layout.operator("sequencer.concatenate", text = "Extract Selected Gaps")             
         layout.operator("sequencer.gap_insert", text = "Insert Gap")
           
 
