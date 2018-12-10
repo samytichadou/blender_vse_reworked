@@ -627,9 +627,9 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
                     if seqs[1].type in {
                     'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
                     'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                    'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-                    'GAUSSIAN_BLUR', 'TEXT',
-                    }:    
+                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+                    #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
+                    }:   
                         seqs[1].select=True  
                         #distance = distance + (seqs[1].frame_final_duration) # can't get the duration of the transition?         
                         bpy.ops.sequencer.delete()                                
@@ -642,8 +642,8 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
                     if s.type not in {
                     'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
                     'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                    'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-                    'GAUSSIAN_BLUR', 'TEXT',
+                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+                    #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:
                         s.frame_start += distance                   
 
@@ -711,8 +711,8 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
             if not s.lock and s.type not in {
                     'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
                     'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                    'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-                    'GAUSSIAN_BLUR', 'TEXT',
+                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+                    #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True                 
@@ -757,8 +757,8 @@ class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
             if seq.type not in {
             'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
             'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-            'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-            'GAUSSIAN_BLUR', 'TEXT',
+            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+            #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
             }:
                  
                 # Find empty channel:
@@ -857,20 +857,20 @@ class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        scn = context.scene
-        if scn and scn.sequence_editor:
+        current_scene = context.scene
+        if current_scene and current_scene.sequence_editor:
             return True
         else:
             return False
 
     def execute(self, context):
-        scn = context.scene
-        seq = scn.sequence_editor
+        current_scene = context.scene
+        current_sequence = current_scene.sequence_editor
         selection = context.selected_sequences        
-        meta_level = len(seq.meta_stack)
+        meta_level = len(current_sequence.meta_stack)
 
         if meta_level > 0:
-            seq = seq.meta_stack[meta_level - 1]
+            current_sequence = current_sequence.meta_stack[meta_level - 1]
         
         if not selection:
             return {'CANCELLED'}  
@@ -880,28 +880,92 @@ class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
             if strip.lock == False and strip.type not in {
             'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
             'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-            'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
-            'GAUSSIAN_BLUR', 'TEXT',
-            }:            
-                context.scene.sequence_editor.active_strip = strip # set as active or it won't work            
-        
-                chn = strip.channel
-                stf = strip.frame_final_end
-                enf = 300000
+            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+            #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
+            }:           
+      
+                current_channel = strip.channel
+                current_end = strip.frame_final_end
+                new_end = 300000
 
-                for i in seq.sequences:
-                    ffs = i.frame_final_start
-                    if (i.channel == chn and ffs+1 > stf):
-                        if ffs < enf:
-                            enf = ffs
-                if enf == 300000 and stf < scn.frame_end:
-                    enf = scn.frame_end
+                for i in current_sequence.sequences:
+                    next_start = i.frame_final_start
+                    if (i.channel == current_channel and next_start+1 > current_end):
+                        if next_start < new_end:
+                            new_end = next_start
+                if new_end == 300000 and current_end < current_scene.frame_end:
+                    new_end = current_scene.frame_end
 
-                if enf == 300000 or enf == stf:
+                if new_end == 300000 or new_end == current_end:
                     error = True
                 else:
                     error = False
-                    strip.frame_final_end = enf                 
+                    strip.frame_final_end = new_end                 
+
+        if error:
+            return {'CANCELLED'} 
+
+        return {'FINISHED'}
+
+
+class SEQUENCER_OT_Concatenate(bpy.types.Operator):
+    bl_idname = 'sequencer.concatenate'
+    bl_label = 'Concatenate'
+    bl_description = 'Concatenate space after selected strips'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        current_scene = context.scene
+        if current_scene and current_scene.sequence_editor:
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        current_scene = context.scene
+        current_sequence = current_scene.sequence_editor
+        selection = context.selected_sequences        
+        meta_level = len(current_sequence.meta_stack)
+
+        if meta_level > 0:
+            current_sequence = current_sequence.meta_stack[meta_level - 1]
+        
+        if not selection:
+            return {'CANCELLED'}  
+
+        error = False                            
+        for strip in selection:
+            if strip.lock == False and strip.type not in {
+            'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+            'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+            #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
+            }:           
+      
+                current_channel = strip.channel               
+                current_end = strip.frame_final_end
+                new_end = 300000
+
+                for i in current_sequence.sequences:
+                    next_start = i.frame_final_start
+                    if (i.channel == current_channel and next_start-1 > current_end):
+                        if next_start < new_end:
+                            new_end = next_start
+                if new_end == 300000 and current_end < current_scene.frame_end:
+                    new_end = current_scene.frame_end
+
+                if new_end == 300000 or new_end == current_end:
+                    error = True
+                else:
+                    # Add color strips in gaps and use ripple delete to extract them
+                    error = False
+                    bpy.ops.sequencer.select_all(action='DESELECT') 
+                    bpy.ops.sequencer.effect_strip_add(frame_start=current_end+1, frame_end=new_end , channel=current_channel , type='COLOR')
+                    bpy.ops.sequencer.ripple_delete()
+
+        bpy.ops.sequencer.select_all(action='DESELECT')                       
+        for s in selection: s.select = True 
 
         if error:
             return {'CANCELLED'} 
@@ -934,4 +998,5 @@ classes = (
     SEQUENCER_OT_Split,  
     SEQUENCER_OT_ExtendToFill,  
     SEQUENCER_OT_Move,
+    SEQUENCER_OT_Concatenate,
 )
