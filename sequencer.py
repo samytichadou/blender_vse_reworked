@@ -833,22 +833,26 @@ class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
                 chn = strip.channel
                 stf = strip.frame_final_end
                 enf = 300000
+                error = False
 
                 for i in seq.sequences:
                     ffs = i.frame_final_start
-                    if (i.channel == chn and ffs > stf):
+                    if (i.channel == chn and ffs+1 > stf):
                         if ffs < enf:
                             enf = ffs
                 if enf == 300000 and stf < scn.frame_end:
                     enf = scn.frame_end
 
                 if enf == 300000 or enf == stf:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Unable to extend')
-                    return {'CANCELLED'}
+                    error = True
                 else:
-                    strip.frame_final_end = enf
+                    error = False
+                    strip.frame_final_end = enf                 
 
-        bpy.ops.sequencer.reload()
+        if error:
+            return {'CANCELLED'} 
+
+        #bpy.ops.sequencer.reload()
         return {'FINISHED'}
 
 
