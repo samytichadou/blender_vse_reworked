@@ -208,11 +208,15 @@ class SEQUENCER_MT_view_zoom(Menu):
 
     def draw(self, context):
         layout = self.layout
-                
+                    
+        layout.menu("SEQUENCER_MT_view_frame")
+            
+        layout.separator()
+        
         layout.operator("view2d.zoom_border", text = "Box...")
         
-        layout.separator()
-       
+        layout.separator()                 
+
         prop = layout.operator("view2d.zoom_in", text="Horizontal In")
         layout.operator("view2d.zoom_out", text="Horizontal Out")         
         layout.operator_context = "EXEC_REGION_WIN"
@@ -268,11 +272,7 @@ class SEQUENCER_MT_view(Menu):
         layout.separator()
 
         if is_sequencer_view:
-            layout.operator_context = 'INVOKE_REGION_WIN'
-            
-            layout.menu("SEQUENCER_MT_view_frame")
-            
-            #layout.separator()            
+            layout.operator_context = 'INVOKE_REGION_WIN'      
             
             layout.menu("SEQUENCER_MT_view_zoom")
             
