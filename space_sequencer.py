@@ -216,8 +216,9 @@ class SEQUENCER_MT_view_zoom(Menu):
         prop = layout.operator("view2d.zoom_in", text="Horizontal In")
         layout.operator("view2d.zoom_out", text="Horizontal Out")         
         layout.operator_context = "EXEC_REGION_WIN"
-        layout.operator("sequencer.zoom_vertical_in", text="Vertical In")
-        layout.operator("sequencer.zoom_vertical_out", text="Vertical Out")                       
+        layout.operator("sequencer.zoom_vertical", text="Vertical In").direction = "IN"
+        layout.operator("sequencer.zoom_vertical", text="Vertical Out").direction = "OUT"                       
+        
         
 class SEQUENCER_MT_view_frame(Menu):
     bl_label = "Frame"
@@ -242,8 +243,8 @@ class SEQUENCER_MT_view_preview(Menu):
         layout.separator()              
                 
         layout.operator("sequencer.preview_selected", text = "Selected")
-        layout.operator("sequencer.preview_start_in_current", text = "Set In")
-        layout.operator("sequencer.preview_end_in_current", text = "Set Out")
+        layout.operator("sequencer.set_preview_range", text = "Set In").type = "IN"
+        layout.operator("sequencer.set_preview_range", text = "Set Out").type = "OUT"
 
 
 class SEQUENCER_MT_view(Menu):
@@ -431,7 +432,6 @@ class SEQUENCER_MT_select(Menu):
         prop = layout.operator("sequencer.select_box", text = "Box...")
 
         layout.separator()           
-
         layout.operator("sequencer.select_all", text="All").action = 'SELECT'         
         layout.operator("sequencer.select_all", text="None").action = 'DESELECT'
         layout.operator("sequencer.select_all", text="Invert").action = 'INVERT'
@@ -654,20 +654,19 @@ class SEQUENCER_MT_edit_split(Menu):
 
     def draw(self, context):
         layout = self.layout
-        #layout.operator("sequencer.cut", text="Soft").type = 'SOFT'
-        #layout.operator("sequencer.cut", text="Hard").type = 'HARD'
-        layout.operator("sequencer.split_soft", text="Soft")        
-        layout.operator("sequencer.split_hard", text="Hard")
+
+        layout.operator("sequencer.split", text="Soft").type = "SOFT"        
+        layout.operator("sequencer.split", text="Hard").type = "HARD"
 
         layout.separator()
         
-        layout.operator("sequencer.split_extract_left", text="Extract Left")
-        layout.operator("sequencer.split_extract_right", text="Extract Right")        
+        layout.operator("sequencer.split_extract", text="Extract Left").direction = "LEFT"
+        layout.operator("sequencer.split_extract", text="Extract Right").direction = "RIGHT"         
  
         layout.separator()
         
-        layout.operator("sequencer.split_lift_left", text="Lift Left")
-        layout.operator("sequencer.split_lift_right", text="Lift Right")       
+        layout.operator("sequencer.split_lift", text="Lift Left").direction = "LEFT"
+        layout.operator("sequencer.split_lift", text="Lift Right").direction = "RIGHT"       
 
 class SEQUENCER_MT_edit_remove(Menu):
     bl_label = "Cut"
@@ -698,6 +697,7 @@ class SEQUENCER_MT_edit(Menu):
         layout.separator()
                 
         layout.operator("sequencer.duplicate_move")
+        layout.operator("sequencer.extend_to_fill")
 
         layout.separator()
        
