@@ -21,7 +21,12 @@
 import bpy
 from bpy.types import Operator
 from operator import attrgetter
-from bpy.props import IntProperty
+from bpy.props import (
+    IntProperty,
+    BoolProperty,
+    EnumProperty,
+    StringProperty,
+)
 
 
 class SEQUENCER_OT_CrossfadeSounds(Operator):
@@ -323,7 +328,9 @@ class SEQUENCER_OT_SelectAllMuteStrips(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene is not None
+        if context.sequences:
+            return True
+        return False
 
     def execute(self, context):
         muteStrips = []
@@ -405,40 +412,32 @@ class SEQUENCER_OT_AudioMuteToggle(bpy.types.Operator):
         return {'FINISHED'}  
 
 
-class SEQUENCER_OT_PreviewEndInCurrent(bpy.types.Operator):
+class SEQUENCER_OT_SetPreviewRange(bpy.types.Operator):
     """Sets preview end to current frame"""
-    bl_idname = "sequencer.preview_end_in_current"
+    bl_idname = "sequencer.set_preview_range"
     bl_label = "Preview End to Current"
     bl_options = {'REGISTER', 'UNDO'}
-
+    type: EnumProperty(
+        name="Type", description="Set Type",
+        items=(
+            ('IN', "In", "Set In"),
+            ('OUT', "Out", "Set Out"),
+        ),
+    )
     @classmethod
     def poll(cls, context):
         return bpy.context.scene is not None
 
     def execute(self, context):
         scene = bpy.context.scene
-        # the -1 below is because we want the scene to end where the cursor is
-        # positioned, not one frame after it (as scene.frame_current behaves)
-        scene.frame_end = scene.frame_current - 1
-        scene.frame_preview_end = scene.frame_current - 1
-
-        return {'FINISHED'}
-
-
-class SEQUENCER_OT_PreviewStartInCurrent(bpy.types.Operator):
-    """Sets Preview start to current frame"""
-    bl_idname = "sequencer.preview_start_in_current"
-    bl_label = "Preview Start to Current"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        return bpy.context.scene is not None
-
-    def execute(self, context):
-        scene = bpy.context.scene
-        scene.frame_start = scene.frame_current
-        scene.frame_preview_start = scene.frame_current
+        if self.type == "OUT":
+            # the -1 below is because we want the scene to end where the cursor is
+            # positioned, not one frame after it (as scene.frame_current behaves)
+            scene.frame_end = scene.frame_current - 1
+            scene.frame_preview_end = scene.frame_current - 1
+        else:
+            scene.frame_start = scene.frame_current
+            scene.frame_preview_start = scene.frame_current            
 
         return {'FINISHED'}
 
@@ -480,11 +479,56 @@ class SEQUENCER_OT_PreviewSelected(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SEQUENCER_OT_SplitExtractLeft(bpy.types.Operator):
-    """Splits selected strips and extracts to the left"""
-    bl_idname = "sequencer.split_extract_left"
-    bl_label = "Split Extract Left"
+class SEQUENCER_OT_SplitExtract(bpy.types.Operator):
+    """Splits selected strips and extracts"""
+    bl_idname = "sequencer.split_extract"
+    bl_label = "Split Extract"
     bl_options = {'REGISTER', 'UNDO'}
+    direction: EnumProperty(
+        name="Direction", description="Split Extract Direction",
+        items=(
+            ('LEFT', "Left", "Split Extract Direction Left"),
+            ('RIGHT', "Right", "Split Extract Direction Right"),
+        ),
+    )
+    @classmethod
+    def poll(cls, context):
+        if context.sequences:
+            return True
+        return False
+
+    def execute(self, context):
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer        
+        selection = bpy.context.selected_sequences
+        if not selection:
+            return {'CANCELLED'}
+          
+        for s in selection:
+            if not s.lock:
+                bpy.ops.sequencer.select_all(action='DESELECT') 
+                s.select = True
+                sequencer.cut(frame=scene.frame_current, type='SOFT', side=self.direction)
+                sequencer.ripple_delete()
+                s.select = False                        
+                for s in selection: s.select = True 
+
+        return {'FINISHED'}
+
+
+class SEQUENCER_OT_SplitLift(bpy.types.Operator):
+    """Splits selected strips and lifts"""
+    bl_idname = "sequencer.split_lift"
+    bl_label = "Split Lift"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    direction: EnumProperty(
+        name="Direction", description="Split Lift Direction",
+        items=(
+            ('LEFT', "Left", "Split Lift Direction Left"),
+            ('RIGHT', "Right", "Split Lift Direction Right"),
+        ),
+    )
 
     @classmethod
     def poll(cls, context):
@@ -501,116 +545,8 @@ class SEQUENCER_OT_SplitExtractLeft(bpy.types.Operator):
         scene = bpy.context.scene
         sequencer = bpy.ops.sequencer
 
-        sequencer.cut(frame=scene.frame_current, type='SOFT', side='LEFT')
-        sequencer.ripple_delete()
-
-        return {'FINISHED'}
-
-
-class SEQUENCER_OT_SplitExtractRight(bpy.types.Operator):
-    """Splits selected strip and extracts to the right"""
-    bl_idname = "sequencer.split_extract_right"
-    bl_label = "Split Extract Right"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
-
-    def execute(self, context):
-        
-        selection = bpy.context.selected_sequences
-        if not selection:
-            return {'CANCELLED'}
-        
-        scene = bpy.context.scene
-        sequencer = bpy.ops.sequencer
-
-        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
-        sequencer.ripple_delete()
-
-        return {'FINISHED'}
-
-
-class SEQUENCER_OT_SplitLiftLeft(bpy.types.Operator):
-    """Splits selected strips and lifts to the left"""
-    bl_idname = "sequencer.split_lift_left"
-    bl_label = "Split Lift Left"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
-
-    def execute(self, context):
-        
-        selection = bpy.context.selected_sequences
-        if not selection:
-            return {'CANCELLED'}
-                
-        scene = bpy.context.scene
-        sequencer = bpy.ops.sequencer
-
-        sequencer.cut(frame=scene.frame_current, type='SOFT', side='LEFT')
-        sequencer.delete()
-
-        return {'FINISHED'}
-
-
-class SEQUENCER_OT_SplitLiftRight(bpy.types.Operator):
-    """Splits selected strip and lifts to the right"""
-    bl_idname = "sequencer.split_lift_right"
-    bl_label = "Split Lift Right"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
-
-    def execute(self, context):
-        
-        selection = bpy.context.selected_sequences
-        if not selection:
-            return {'CANCELLED'}
-        
-        scene = bpy.context.scene
-        sequencer = bpy.ops.sequencer
-
-        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
-        sequencer.delete()
-
-        return {'FINISHED'}
-
-
-class SEQUENCER_OT_SplitLiftRight(bpy.types.Operator):
-    """Splits selected strip and lifts to the right"""
-    bl_idname = "sequencer.split_lift_right"
-    bl_label = "Split Lift Right"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @classmethod
-    def poll(cls, context):
-        if context.sequences:
-            return True
-        return False
-
-    def execute(self, context):
-        
-        selection = bpy.context.selected_sequences
-        if not selection:
-            return {'CANCELLED'}
-        
-        scene = bpy.context.scene
-        sequencer = bpy.ops.sequencer
-
-        sequencer.cut(frame=scene.frame_current, type='SOFT', side='RIGHT')
-        sequencer.delete()
+        sequencer.cut(frame=scene.frame_current, type='SOFT', side=self.direction)
+        sequencer.delete_lift()
 
         return {'FINISHED'}
 
@@ -686,7 +622,7 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
 
                 seqs = sorted(seqs, key=attrgetter('channel', 'frame_final_start'))
                 
-                # delete effect strips(dissolves) if they are adjoined the active strip:
+                # delete effect strips(ex. dissolves) if they are adjoined selected strips:
                 if len(seqs)-1 > 1:
                     if seqs[1].type in {
                     'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
@@ -714,12 +650,20 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
         return {'FINISHED'}  
 
 
-class SEQUENCER_OT_ZoomVerticalIn(bpy.types.Operator):
-    """Zoom Vertical In"""
+class SEQUENCER_OT_ZoomVertical(bpy.types.Operator):
+    """Zoom Vertical"""
     
-    bl_idname = "sequencer.zoom_vertical_in"
-    bl_label = "Zoom Vertical In"
+    bl_idname = "sequencer.zoom_vertical"
+    bl_label = "Zoom Vertical"
     bl_options = {'REGISTER', 'UNDO'}    
+
+    direction: EnumProperty(
+        name="Direction", description="Vertical Zoom Direction",
+        items=(
+            ('OUT', "Out", "Zoom Vertical Out"),
+            ('IN', "In", "Zoom Vertical In"),
+        ),
+    )
 
     @classmethod
     def poll(cls, context):
@@ -727,25 +671,10 @@ class SEQUENCER_OT_ZoomVerticalIn(bpy.types.Operator):
 
     def execute(self, context):
       
-        bpy.ops.view2d.zoom(deltay=1)      
-
-        return {'FINISHED'} 
-
-
-class SEQUENCER_OT_ZoomVerticalOut(bpy.types.Operator):
-    """Zoom Vertical Out"""
-    
-    bl_idname = "sequencer.zoom_vertical_out"
-    bl_label = "Zoom Vertical Out"
-    bl_options = {'REGISTER', 'UNDO'}    
-
-    @classmethod
-    def poll(cls, context):
-        return bpy.context.scene is not None
-
-    def execute(self, context):
-      
-        bpy.ops.view2d.zoom(deltay=-1)      
+        if self.direction == "OUT": 
+            bpy.ops.view2d.zoom(deltay=-1) 
+        else:         
+            bpy.ops.view2d.zoom(deltay=1) 
 
         return {'FINISHED'} 
 
@@ -791,7 +720,18 @@ class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
                     bpy.ops.sequencer.select_all(action='DESELECT')
                     seq.select = True
                     context.scene.sequence_editor.active_strip = seq # set as active or it won't work
-                    bpy.ops.sequencer.duplicate_move(SEQUENCER_OT_duplicate={"mode":'TRANSLATION'}, TRANSFORM_OT_seq_slide={"value":(0, empty_channel-seq.channel), "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "release_confirm":False, "use_accurate":False})
+                    bpy.ops.sequencer.duplicate_move(
+                    SEQUENCER_OT_duplicate={"mode":'TRANSLATION'},
+                    TRANSFORM_OT_seq_slide={
+                    "value":(0, empty_channel-seq.channel),
+                    "snap":False,
+                    "snap_target":'CLOSEST',
+                    "snap_point":(0, 0, 0),
+                    "snap_align":False,
+                    "snap_normal":(0, 0, 0),
+                    "release_confirm":False,
+                    "use_accurate":False},
+                    )
                     bpy.ops.sequencer.offset_clear()
 
         #re-select previous selection
@@ -801,56 +741,20 @@ class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
         return {'FINISHED'} 
 
 
-class SEQUENCER_OT_SplitSoft(bpy.types.Operator):
+class SEQUENCER_OT_Split(bpy.types.Operator):
     """Split Unlocked Un/Seleted Strips Soft"""
     
-    bl_idname = "sequencer.split_soft"
+    bl_idname = "sequencer.split"
     bl_label = "Split Soft"
     bl_options = {'REGISTER', 'UNDO'}    
 
-    @classmethod
-    def poll(cls, context):
-        return bpy.context.scene is not None
-
-    def execute(self, context):
-        selection = context.selected_sequences
-        sequences = bpy.context.scene.sequence_editor.sequences_all
-        cf = bpy.context.scene.frame_current
-        at_cursor = [] 
-        cut_selected = False
-
-        #find unlocked strips at cursor 
-        for s in sequences:
-            if s.frame_final_start<=cf and s.frame_final_end > cf:
-                if s.lock == False:
-                    at_cursor.append(s)
-                    if s.select == True: 
-                        cut_selected = True
-
-        for s in at_cursor:
-            if cut_selected: 
-                if s.select:    #only cut selected  
-                    bpy.ops.sequencer.select_all(action='DESELECT') 
-                    s.select = True
-                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "SOFT") 
-                    bpy.ops.sequencer.select_all(action='DESELECT')                        
-                    for s in selection: s.select = True     
-                                  
-            else:               #cut unselected
-                bpy.ops.sequencer.select_all(action='DESELECT') 
-                s.select = True
-                bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "SOFT") 
-                bpy.ops.sequencer.select_all(action='DESELECT')                       
-                for s in selection: s.select = True         
-        return {'FINISHED'}   
-
-
-class SEQUENCER_OT_SplitHard(bpy.types.Operator):
-    """Split Unlocked Un/Seleted Strips Hard"""
-    
-    bl_idname = "sequencer.split_hard"
-    bl_label = "Split Hard"
-    bl_options = {'REGISTER', 'UNDO'}    
+    type: EnumProperty(
+        name="Type", description="Split Type",
+        items=(
+            ('SOFT', "Soft", "Split Soft"),
+            ('HARD', "Hard", "Split Hard"),
+        ),
+    )
 
     @classmethod
     def poll(cls, context):
@@ -878,17 +782,74 @@ class SEQUENCER_OT_SplitHard(bpy.types.Operator):
                 if s.select:    #only cut selected  
                     bpy.ops.sequencer.select_all(action='DESELECT') 
                     s.select = True
-                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "HARD") 
+                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = self.type)                                            
                     bpy.ops.sequencer.select_all(action='DESELECT')                        
                     for s in selection: s.select = True     
                                   
             else:               #cut unselected
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True
-                bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = "HARD") 
+                bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = self.type)                 
                 bpy.ops.sequencer.select_all(action='DESELECT')                       
-                for s in selection: s.select = True          
-        return {'FINISHED'} 
+                for s in selection: s.select = True         
+        return {'FINISHED'}   
+
+
+class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
+    bl_idname = 'sequencer.extend_to_fill'
+    bl_label = 'Extend to Fill'
+    bl_description = 'Extend selected strips forward to fill adjacent space'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        scn = context.scene
+        if scn and scn.sequence_editor:
+            return True
+        else:
+            return False
+
+    def execute(self, context):
+        scn = context.scene
+        seq = scn.sequence_editor
+        selection = context.selected_sequences        
+        meta_level = len(seq.meta_stack)
+
+        if meta_level > 0:
+            seq = seq.meta_stack[meta_level - 1]
+        
+        if not selection:
+            return {'CANCELLED'}  
+                            
+        for strip in selection:
+            if strip.lock == False and strip.type not in {
+            'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+            'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+            'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+            'GAUSSIAN_BLUR', 'TEXT',
+            }:            
+                context.scene.sequence_editor.active_strip = strip # set as active or it won't work            
+        
+                chn = strip.channel
+                stf = strip.frame_final_end
+                enf = 300000
+
+                for i in seq.sequences:
+                    ffs = i.frame_final_start
+                    if (i.channel == chn and ffs > stf):
+                        if ffs < enf:
+                            enf = ffs
+                if enf == 300000 and stf < scn.frame_end:
+                    enf = scn.frame_end
+
+                if enf == 300000 or enf == stf:
+                    self.report({'ERROR_INVALID_INPUT'}, 'Unable to extend')
+                    return {'CANCELLED'}
+                else:
+                    strip.frame_final_end = enf
+
+        bpy.ops.sequencer.reload()
+        return {'FINISHED'}
 
 
 classes = (
@@ -905,18 +866,14 @@ classes = (
     SEQUENCER_OT_SelectAllMuteStrips,
     SEQUENCER_OT_ToggleAllModifiers,
     SEQUENCER_OT_AudioMuteToggle,
-    SEQUENCER_OT_PreviewStartInCurrent,
-    SEQUENCER_OT_PreviewEndInCurrent,
+    SEQUENCER_OT_SetPreviewRange,
     SEQUENCER_OT_PreviewSelected,
-    SEQUENCER_OT_SplitExtractLeft,
-    SEQUENCER_OT_SplitExtractRight,
-    SEQUENCER_OT_SplitLiftLeft,
-    SEQUENCER_OT_SplitLiftRight, 
+    SEQUENCER_OT_SplitExtract,
+    SEQUENCER_OT_SplitLift,
     SEQUENCER_OT_DeleteLift, 
     SEQUENCER_OT_RippleDelete, 
-    SEQUENCER_OT_ZoomVerticalIn,
-    SEQUENCER_OT_ZoomVerticalOut,
+    SEQUENCER_OT_ZoomVertical,
     SEQUENCER_OT_MatchFrame,
-    SEQUENCER_OT_SplitHard,
-    SEQUENCER_OT_SplitSoft,     
+    SEQUENCER_OT_Split,  
+    SEQUENCER_OT_ExtendToFill,  
 )
