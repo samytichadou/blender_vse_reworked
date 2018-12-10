@@ -852,7 +852,6 @@ class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
         if error:
             return {'CANCELLED'} 
 
-        #bpy.ops.sequencer.reload()
         return {'FINISHED'}
 
 
