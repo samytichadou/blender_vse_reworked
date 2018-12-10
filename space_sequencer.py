@@ -204,17 +204,15 @@ class SEQUENCER_MT_preview_zoom(Menu):
         
         
 class SEQUENCER_MT_view_zoom(Menu):
-    bl_label = "Zoom"
+    bl_label = "Frame"
 
     def draw(self, context):
         layout = self.layout
                     
-        layout.menu("SEQUENCER_MT_view_frame")
-            
-        layout.separator()
-        
         layout.operator("view2d.zoom_border", text = "Box...")
-        
+        layout.operator("sequencer.view_selected", text="Selected")     
+        layout.operator("sequencer.view_all", text="All")
+        layout.operator("sequencer.view_frame", text="Playhead")         
         layout.separator()                 
 
         prop = layout.operator("view2d.zoom_in", text="Horizontal In")
@@ -229,10 +227,11 @@ class SEQUENCER_MT_view_frame(Menu):
 
     def draw(self, context):
         layout = self.layout        
-
+            
+'''        layout.operator("view2d.zoom_border", text = "Box...")
         layout.operator("sequencer.view_selected", text="Selected")     
         layout.operator("sequencer.view_all", text="All")
-        layout.operator("sequencer.view_frame", text="Playhead")        
+        layout.operator("sequencer.view_frame", text="Playhead") '''       
 
 
 class SEQUENCER_MT_view_preview(Menu):
@@ -276,13 +275,11 @@ class SEQUENCER_MT_view(Menu):
             
             layout.menu("SEQUENCER_MT_view_zoom")
             
-            #layout.separator()   
-            
             layout.menu("SEQUENCER_MT_view_preview")          
             
             layout.operator_context = 'INVOKE_DEFAULT'
             
-            #layout.separator()
+            layout.separator()
             
         if is_preview:
             layout.operator_context = 'INVOKE_REGION_PREVIEW'
@@ -301,19 +298,18 @@ class SEQUENCER_MT_view(Menu):
 
         if is_sequencer_view:
 
-            layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
-
-            layout.separator()               
-
             layout.prop(st, "show_backdrop",text="Backdrop")            
             layout.prop(st, "show_strip_offset", text="Offsets")   
 
-            #layout.separator()                
-                     
             layout.prop(st, "show_frame_indicator", text="Frame Number")
+
+            #layout.separator()                
+                                 
             layout.prop(st, "show_seconds", text="Seconds")            
             if context.space_data.show_seconds:
                 layout.prop(context.user_preferences.view, "timecode_style", text="")            
+
+            layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
 
         if is_preview:
             if st.display_mode == 'IMAGE':
@@ -340,6 +336,19 @@ class SEQUENCER_MT_transform_gaps(Menu):
         layout.operator("sequencer.gap_remove", text = "Extract Gap").all=False
         layout.operator("sequencer.gap_remove", text = "Extract All Gaps").all=True        
         layout.operator("sequencer.gap_insert", text = "Insert Gap")
+          
+
+class SEQUENCER_MT_transform_move(Menu):
+    bl_label = "Move in Steps"
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.operator("sequencer.move", text = "Up").direction = "UP"
+        layout.operator("sequencer.move", text = "Down").direction = "DOWN"
+        layout.operator("sequencer.move", text = "Left").direction = "LEFT"
+        layout.operator("sequencer.move", text = "Right").direction = "RIGHT" 
+
 
 class SEQUENCER_MT_transform(Menu):
     bl_label = "Transform"
@@ -350,6 +359,10 @@ class SEQUENCER_MT_transform(Menu):
         layout.operator("transform.transform", text="Move").mode = 'TRANSLATION'
         layout.operator("transform.transform", text="Move/Extend from Frame").mode = 'TIME_EXTEND'
         layout.operator("sequencer.slip", text="Slip Strip Contents")
+
+        layout.separator()
+
+        layout.menu("SEQUENCER_MT_transform_move")
 
         layout.separator()
 
@@ -1684,7 +1697,8 @@ classes = (
     SEQUENCER_MT_edit_split, 
     SEQUENCER_MT_edit_remove,        
     SEQUENCER_MT_transform,
-    SEQUENCER_MT_transform_gaps,     
+    SEQUENCER_MT_transform_gaps,
+    SEQUENCER_MT_transform_move,     
     SEQUENCER_MT_strip,
     SEQUENCER_MT_strip_movie,    
     SEQUENCER_MT_strip_input,
