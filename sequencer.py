@@ -679,6 +679,60 @@ class SEQUENCER_OT_ZoomVertical(bpy.types.Operator):
         return {'FINISHED'} 
 
 
+class SEQUENCER_OT_Move(bpy.types.Operator):
+    """Move Selection"""
+    
+    bl_idname = "sequencer.move"
+    bl_label = "Move"
+    bl_options = {'REGISTER', 'UNDO'}    
+
+    direction: EnumProperty(
+        name="Direction", description="Move",
+        items=(
+            ('UP', "Up", "Move Selection Up"),
+            ('DOWN', "Down", "Move Selection Down"),
+            ('LEFT', "Left", "Move Selection Left"),
+            ('RIGHT', "Right", "Move Selection Right"),                        
+        ),
+    )
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene is not None
+
+    def execute(self, context):
+
+        selection = context.selected_sequences
+        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions        
+        if not selection:
+            return {'CANCELLED'}        
+
+        for s in selection:
+            if not s.lock and s.type not in {
+                    'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
+                    'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
+                    'TRANSFORM', 'COLOR', 'SPEED', 'MULTICAM', 'ADJUSTMENT',
+                    'GAUSSIAN_BLUR', 'TEXT',
+                    }:
+                bpy.ops.sequencer.select_all(action='DESELECT') 
+                s.select = True                 
+
+                for s in selection: s.select = True
+                if self.direction == "UP": 
+                    bpy.ops.transform.seq_slide(value=(0, 1))                    
+                elif self.direction == "DOWN":         
+                    bpy.ops.transform.seq_slide(value=(0, -1))
+                elif self.direction == "LEFT":   
+                    bpy.ops.transform.seq_slide(value=(-10, 0))                        
+                elif self.direction == "RIGHT":               
+                    bpy.ops.transform.seq_slide(value=(10, 0))
+                        
+                s.select = False                        
+                for s in selection: s.select = True                 
+
+        return {'FINISHED'} 
+
+
 class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
     """Add full source to empty channel and match frame"""
     
@@ -820,7 +874,8 @@ class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
         
         if not selection:
             return {'CANCELLED'}  
-                            
+
+        error = False                            
         for strip in selection:
             if strip.lock == False and strip.type not in {
             'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
@@ -833,7 +888,6 @@ class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
                 chn = strip.channel
                 stf = strip.frame_final_end
                 enf = 300000
-                error = False
 
                 for i in seq.sequences:
                     ffs = i.frame_final_start
@@ -879,4 +933,5 @@ classes = (
     SEQUENCER_OT_MatchFrame,
     SEQUENCER_OT_Split,  
     SEQUENCER_OT_ExtendToFill,  
+    SEQUENCER_OT_Move,
 )
