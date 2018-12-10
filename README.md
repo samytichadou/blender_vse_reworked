@@ -24,6 +24,7 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 - Proper Soft/Hard Split
 - Preserve Locked Strips from split, extract and delete
 - Extend to fill
+- Move in Steps
 
 
 ### Existing functions added to menu:
