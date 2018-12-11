@@ -718,9 +718,10 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
                     'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
                     #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:
+                current_start = s.frame_final_start        
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True                 
-
+                context.scene.sequence_editor.active_strip = s
                 if self.direction == "UP": 
                     if (s.channel < 32):
                         s.channel += 1                  
@@ -728,10 +729,14 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
                     if (s.channel > 1):
                         s.channel -= 1
                 elif self.direction == "LEFT":   
-                    bpy.ops.transform.seq_slide(value=(-25, 0))                        
+                    bpy.ops.transform.seq_slide(value=(-25, 0))
+                    if s.frame_final_start == current_start:
+                        bpy.ops.sequencer.swap(side='LEFT')
+
                 elif self.direction == "RIGHT":               
                     bpy.ops.transform.seq_slide(value=(25, 0))
-                        
+                    if s.frame_final_start == current_start:                    
+                        bpy.ops.sequencer.swap(side='RIGHT')
                 s.select = False    
                                     
         for s in selection: s.select = True                 
