@@ -703,7 +703,11 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
     def execute(self, context):
 
         selection = context.selected_sequences
-        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions        
+        selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
+
+        if self.direction == "UP":
+            selection.reverse()
+        
         if not selection:
             return {'CANCELLED'}        
 
@@ -717,18 +721,20 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True                 
 
-                for s in selection: s.select = True
                 if self.direction == "UP": 
-                    bpy.ops.transform.seq_slide(value=(0, 1))                    
+                    if (s.channel < 32):
+                        s.channel += 1                  
                 elif self.direction == "DOWN":         
-                    bpy.ops.transform.seq_slide(value=(0, -1))
+                    if (s.channel > 1):
+                        s.channel -= 1
                 elif self.direction == "LEFT":   
-                    bpy.ops.transform.seq_slide(value=(-10, 0))                        
+                    bpy.ops.transform.seq_slide(value=(-25, 0))                        
                 elif self.direction == "RIGHT":               
-                    bpy.ops.transform.seq_slide(value=(10, 0))
+                    bpy.ops.transform.seq_slide(value=(25, 0))
                         
-                s.select = False                        
-                for s in selection: s.select = True                 
+                s.select = False    
+                                    
+        for s in selection: s.select = True                 
 
         return {'FINISHED'} 
 
