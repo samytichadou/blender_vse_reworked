@@ -224,8 +224,6 @@ class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
     bl_label = "Select Current Frame"
     bl_options = {"REGISTER", "UNDO"}
     
-    all=bpy.props.BoolProperty()
-
     @classmethod
     def poll(cls, context):
         return bpy.context.area.type=='SEQUENCE_EDITOR' and bpy.context.scene.sequence_editor is not None
@@ -359,12 +357,12 @@ class SEQUENCER_OT_ToggleAllModifiers(bpy.types.Operator):
     def poll(cls, context):
         return bpy.context.scene is not None
 
-    selection_only = bpy.props.BoolProperty(
+    selection_only: BoolProperty(
         name="Only Selected",
         default=False,
         description="Only apply to selected strips")
 
-    showhide = bpy.props.EnumProperty(
+    showhide: EnumProperty(
         items = [('show', 'Show', 'Make modifiers visible'),
                 ('hide', 'Hide', 'Make modifiers not visible'),
                 ('toggle', 'Toggle', 'Toggle modifier visilibity per modifier')],
@@ -718,13 +716,14 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
                     'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
                     #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:
-                current_start = s.frame_final_start        
+                current_start = s.frame_final_start 
+                current_channel = s.channel       
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True                 
                 context.scene.sequence_editor.active_strip = s
                 if self.direction == "UP": 
                     if (s.channel < 32):
-                        s.channel += 1                  
+                        s.channel += 1               
                 elif self.direction == "DOWN":         
                     if (s.channel > 1):
                         s.channel -= 1
