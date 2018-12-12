@@ -224,8 +224,6 @@ class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
     bl_label = "Select Current Frame"
     bl_options = {"REGISTER", "UNDO"}
     
-    all=bpy.props.BoolProperty()
-
     @classmethod
     def poll(cls, context):
         return bpy.context.area.type=='SEQUENCE_EDITOR' and bpy.context.scene.sequence_editor is not None
@@ -359,12 +357,12 @@ class SEQUENCER_OT_ToggleAllModifiers(bpy.types.Operator):
     def poll(cls, context):
         return bpy.context.scene is not None
 
-    selection_only = bpy.props.BoolProperty(
+    selection_only: BoolProperty(
         name="Only Selected",
         default=False,
         description="Only apply to selected strips")
 
-    showhide = bpy.props.EnumProperty(
+    showhide: EnumProperty(
         items = [('show', 'Show', 'Make modifiers visible'),
                 ('hide', 'Hide', 'Make modifiers not visible'),
                 ('toggle', 'Toggle', 'Toggle modifier visilibity per modifier')],
@@ -703,7 +701,11 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
     def execute(self, context):
 
         selection = context.selected_sequences
-        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions        
+        selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
+
+        if self.direction == "UP":
+            selection.reverse()
+        
         if not selection:
             return {'CANCELLED'}        
 
@@ -714,21 +716,29 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
                     'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
                     #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:
+                current_start = s.frame_final_start 
+                current_channel = s.channel       
                 bpy.ops.sequencer.select_all(action='DESELECT') 
                 s.select = True                 
-
-                for s in selection: s.select = True
+                context.scene.sequence_editor.active_strip = s
                 if self.direction == "UP": 
-                    bpy.ops.transform.seq_slide(value=(0, 1))                    
+                    if (s.channel < 32):
+                        s.channel += 1               
                 elif self.direction == "DOWN":         
-                    bpy.ops.transform.seq_slide(value=(0, -1))
+                    if (s.channel > 1):
+                        s.channel -= 1
                 elif self.direction == "LEFT":   
-                    bpy.ops.transform.seq_slide(value=(-10, 0))                        
+                    bpy.ops.transform.seq_slide(value=(-25, 0))
+                    if s.frame_final_start == current_start:
+                        bpy.ops.sequencer.swap(side='LEFT')
+
                 elif self.direction == "RIGHT":               
-                    bpy.ops.transform.seq_slide(value=(10, 0))
-                        
-                s.select = False                        
-                for s in selection: s.select = True                 
+                    bpy.ops.transform.seq_slide(value=(25, 0))
+                    if s.frame_final_start == current_start:                    
+                        bpy.ops.sequencer.swap(side='RIGHT')
+                s.select = False    
+                                    
+        for s in selection: s.select = True                 
 
         return {'FINISHED'} 
 

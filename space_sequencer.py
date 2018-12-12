@@ -333,9 +333,12 @@ class SEQUENCER_MT_transform_gaps(Menu):
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("sequencer.gap_remove", text = "Extract Gap").all=False
-        layout.operator("sequencer.gap_remove", text = "Extract All Gaps").all=True   
-        layout.operator("sequencer.concatenate", text = "Extract Selected Gaps")             
+        layout.operator("sequencer.gap_remove", text = "Extract at Playhead").all=False
+        layout.operator("sequencer.gap_remove", text = "Extract All").all=True   
+        layout.operator("sequencer.concatenate", text = "Extract after Selection") 
+        
+        layout.separator()
+                            
         layout.operator("sequencer.gap_insert", text = "Insert Gap")
           
 
@@ -435,7 +438,30 @@ class SEQUENCER_MT_select_channel(Menu):
         layout.operator("sequencer.select_channel", text="All")         
         layout.operator("sequencer.select_active_side", text="Left").side = 'LEFT'
         layout.operator("sequencer.select_active_side", text="Right").side = 'RIGHT'
+ 
+class SEQUENCER_MT_select_Mouse(Menu):
+    bl_label = "Select Mouse"
+
+    def draw(self, context):
+        layout = self.layout 
         
+        props = layout.operator("sequencer.select", text = "Handles")
+        props.extend = False 
+        props.linked_time = False           
+        props.left_right = 'NONE' 
+        props.linked_handle = True        
+        
+        props = layout.operator("sequencer.select", text = "Time Linked")
+        props.extend = False 
+        props.linked_time = True           
+        props.left_right = 'MOUSE' 
+        props.linked_handle = False 
+ 
+        props = layout.operator("sequencer.select", text = "Extended")
+        props.extend = True 
+        props.linked_time = False           
+        props.left_right = 'NONE'                       
+        props.linked_handle = False        
 
 class SEQUENCER_MT_select(Menu):
     bl_label = "Select"
@@ -455,13 +481,14 @@ class SEQUENCER_MT_select(Menu):
         layout.menu("SEQUENCER_MT_select_cursor", text ="Playhead")         
         layout.menu("SEQUENCER_MT_select_handle", text ="Handle") 
         layout.menu("SEQUENCER_MT_select_channel", text ="Channel")
+        layout.menu("SEQUENCER_MT_select_Mouse", text ="Mouse Cursor")
 
         layout.separator()
 
         layout.operator("sequencer.select_less", text = "Less")
         layout.operator("sequencer.select_more", text = "More")
-        layout.operator("sequencer.select_linked", text = "Linked")   
-        
+        layout.operator("sequencer.select_linked", text = "Linked")
+                        
         layout.separator()
 
         layout.operator("sequencer.select_all_locked_strips", text = "Locked")
@@ -1687,7 +1714,8 @@ classes = (
     SEQUENCER_MT_view_preview,          
     SEQUENCER_MT_select_cursor,    
     SEQUENCER_MT_select_handle, 
-    SEQUENCER_MT_select_channel,       
+    SEQUENCER_MT_select_channel,
+    SEQUENCER_MT_select_Mouse,           
     SEQUENCER_MT_select,
     SEQUENCER_MT_add,
     SEQUENCER_MT_add_effect,

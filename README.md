@@ -1,6 +1,6 @@
 # BLENDER VIDEO SEQUENCE EDITOR - REWORKED
 
-A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
+A working suggestion for reworking the Blender 2.80 VSE menus and additional functions within the limits of the two altered Blender-native python files: bl_ui/space_sequencer.py and bl_operators/sequencer.py.
 
 ### New functions added to the menu:
 
@@ -24,7 +24,7 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 - Proper Soft/Hard Split
 - Preserve Locked Strips from split, extract and delete
 - Extend to fill
-- Move in Steps
+- Move in Steps(+swap left/right)
 - Concatenate
 
 ### Existing functions added to menu:
@@ -41,6 +41,9 @@ A suggestion for reworking the Blender 2.80 VSE menus and additional functions.
 - Reverse
 - Remove All Gaps
 - Select Box...
+- Select Extended
+- Select Time Linked
+- Select Handles
 
 
 ### Installation:
@@ -64,6 +67,8 @@ Download: https://raw.githubusercontent.com/tin2tin/blender_vse_reworked/master/
 Import the keymap: Edit > Settings... > Input > Import Key Configuration 
 
 ### Contribute:
+
+- If you want to contribute then start by taking a look at the New Features/Issues List. Is there something here you can help out with? https://github.com/samytichadou/blender_vse_reworked/issues
 
 - Share your opinion on what additional edit functions(existing python operators), which can be executed from the menu, should we add?
 Let us know here or on the VSE chat: https://blender.chat/channel/vse
