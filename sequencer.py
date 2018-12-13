@@ -564,8 +564,7 @@ class SEQUENCER_OT_DeleteLift(bpy.types.Operator):
 
     def execute(self, context):
 
-        selection = context.selected_sequences
-        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions        
+        selection = context.selected_sequences       
         if not selection:
             return {'CANCELLED'}        
 
@@ -595,7 +594,6 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
 
     def execute(self, context):
 
-        #bpy.ops.sequencer.copy() #Can't copy strips involved in transitions
         selection = context.selected_sequences
         selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
         
@@ -983,6 +981,46 @@ class SEQUENCER_OT_Concatenate(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class Sequencer_OT_JogShuttle(bpy.types.Operator):
+    bl_label = 'Jog/Shuttle'
+    bl_idname = 'sequencer.jogshuttle'
+    bl_description = 'Jog through current sequence'
+
+    def execute(self, context):
+        scn = context.scene
+        start_frame = scn.frame_start
+        end_frame = scn.frame_end
+        duration = end_frame - start_frame
+        diff = self.x - self.init_x
+        diff /= 0.5
+        diff = int(diff)
+        extended_frame = diff + (self.init_current_frame - start_frame)
+        looped_frame = extended_frame % (duration + 1)
+        target_frame = start_frame + looped_frame
+        context.scene.frame_current = target_frame
+
+    def modal(self, context, event):
+        if event.type == 'MOUSEMOVE':
+            self.x = event.mouse_x
+            self.execute(context)
+        elif event.type == 'LEFTMOUSE':
+            return {'FINISHED'}
+        elif event.type in ('RIGHTMOUSE', 'ESC'):
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        scn = context.scene
+        self.x = event.mouse_x
+        self.init_x = self.x
+        self.init_current_frame = scn.frame_current
+        self.execute(context)
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+
+
+
 classes = (
     SEQUENCER_OT_CrossfadeSounds,
     SEQUENCER_OT_CutMulticam,
@@ -1009,4 +1047,5 @@ classes = (
     SEQUENCER_OT_ExtendToFill,  
     SEQUENCER_OT_Move,
     SEQUENCER_OT_Concatenate,
+    Sequencer_OT_JogShuttle,
 )
