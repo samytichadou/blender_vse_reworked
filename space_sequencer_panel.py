@@ -1027,7 +1027,7 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
             col = layout.column()
             col.prop(strip, "transition_type")
             col.alignment = "RIGHT"
-            col.label(text="Direction")
+            #col.label(text="Direction")
             col.row().prop(strip, "direction", expand=True)
 
             col = layout.column()
@@ -1062,11 +1062,12 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
 
             col.prop(strip, "interpolation")
             col.prop(strip, "translation_unit")
-            col = layout.column(align=True)
-            col.label(text="Position")
-            row = col.row(align=True)
-            row.prop(strip, "translate_start_x", text="X")
-            row.prop(strip, "translate_start_y", text="Y")
+            #col = layout.column(align=True)
+            #col.label(text="Position")
+            #row = col.row(align=True)
+            layout=layout.column(align=True)
+            layout.prop(strip, "translate_start_x", text="Position X")
+            layout.prop(strip, "translate_start_y", text="Y")
 
             layout.separator()
 
@@ -1076,17 +1077,18 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
                 col = layout.column(align=True)
                 col.prop(strip, "scale_start_x", text="Scale")
             else:
-                col = layout.column(align=True)
-                col.label(text="Scale")
-                row = col.row(align=True)
-                row.prop(strip, "scale_start_x", text="X")
-                row.prop(strip, "scale_start_y", text="Y")
+                #col = layout.column(align=True)
+                #col.label(text="Scale")
+                #row = col.row(align=True)
+                #layout=layout.column(align=True)                
+                layout.prop(strip, "scale_start_x", text="Scale X")
+                layout.prop(strip, "scale_start_y", text="Y")
 
             layout.separator()
 
-            col = layout.column(align=True)
-            col.label(text="Rotation")
-            col.prop(strip, "rotation_start", text="Rotation")
+            #col = layout.column(align=True)
+            #col.label(text="Rotation")
+            layout.prop(strip, "rotation_start", text="Rotation")
 
         elif strip.type == 'MULTICAM':
             col = layout.column(align=True)
@@ -1096,8 +1098,8 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
 
             # The multicam strip needs at least 2 strips to be useful
             if strip_channel > 2:
-                BT_ROW = 4
-                col.alignment = "RIGHT"
+                BT_ROW = 2
+                #col.alignment = "RIGHT"
                 col.label(text="Cut To")
                 row = col.row()
 
@@ -1150,13 +1152,13 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
             if not strip.use_default_fade:
                 col.prop(strip, "effect_fader", text="Effect Fader")
         elif strip.type == 'GAUSSIAN_BLUR':
-            row = col.row(align=True)
-            row.prop(strip, "size_x")
-            row.prop(strip, "size_y")
+            layout = layout.column(align=True)
+            layout.prop(strip, "size_x", text = "Size X")
+            layout.prop(strip, "size_y", text = "Y")
         elif strip.type == 'COLORMIX':
-            split = layout.split(factor=0.35)
-            split.label(text="Blend Mode")
-            split.prop(strip, "blend_effect", text="")
+            #split = layout.split(factor=0.35)
+            #split.label(text="Blend Mode")
+            layout.prop(strip, "blend_effect", text="Blend Mode")
             row = layout.row(align=True)
             row.prop(strip, "factor", slider=True)
 
@@ -1602,7 +1604,8 @@ class SEQUENCER_PT_preview(SequencerButtonsPanel_Output, Panel):
 
     def draw(self, context):
         layout = self.layout
-
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
         render = context.scene.render
 
         col = layout.column()
@@ -1657,8 +1660,8 @@ class SEQUENCER_PT_view_safe_areas(SequencerButtonsPanel_Output, Panel):
         from .properties_data_camera import draw_display_safe_settings
 
         layout = self.layout
-        layout.use_property_split = True
-        layout.use_property_decorate = False  # No animation.
+        #layout.use_property_split = True
+        #layout.use_property_decorate = False  # No animation.
 
         st = context.space_data
         safe_data = context.scene.safe_areas
