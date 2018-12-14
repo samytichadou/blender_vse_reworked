@@ -289,8 +289,6 @@ class SEQUENCER_MT_view(Menu):
 
             layout.menu("SEQUENCER_MT_preview_zoom")
 
-            layout.separator()
-
             layout.operator_context = 'INVOKE_DEFAULT'         
             
             # # XXX, invokes in the header view
@@ -312,10 +310,19 @@ class SEQUENCER_MT_view(Menu):
             layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
 
         if is_preview:
+           
+           
             if st.display_mode == 'IMAGE':
-                layout.prop(st, "show_safe_areas")
+
+                layout.separator()                  
+                
+                layout.prop(st, "show_safe_areas")              
                 layout.prop(st, "show_metadata")
+                
             elif st.display_mode == 'WAVEFORM':
+
+                layout.separator()                  
+                
                 layout.prop(st, "show_separate_color")
 
         layout.separator()
@@ -461,7 +468,18 @@ class SEQUENCER_MT_select_Mouse(Menu):
         props.extend = True 
         props.linked_time = False           
         props.left_right = 'NONE'                       
-        props.linked_handle = False        
+        props.linked_handle = False 
+        
+class SEQUENCER_MT_select_linked(Menu):
+    bl_label = "Select Linked"
+
+    def draw(self, context):
+        layout = self.layout         
+
+        layout.operator("sequencer.select_linked", text = "All") 
+        layout.operator("sequencer.select_less", text = "Less")
+        layout.operator("sequencer.select_more", text = "More")
+              
 
 class SEQUENCER_MT_select(Menu):
     bl_label = "Select"
@@ -481,13 +499,8 @@ class SEQUENCER_MT_select(Menu):
         layout.menu("SEQUENCER_MT_select_cursor", text ="Playhead")         
         layout.menu("SEQUENCER_MT_select_handle", text ="Handle") 
         layout.menu("SEQUENCER_MT_select_channel", text ="Channel")
+        layout.menu("SEQUENCER_MT_select_linked", text ="Linked")        
         layout.menu("SEQUENCER_MT_select_Mouse", text ="Mouse Cursor")
-
-        layout.separator()
-
-        layout.operator("sequencer.select_less", text = "Less")
-        layout.operator("sequencer.select_more", text = "More")
-        layout.operator("sequencer.select_linked", text = "Linked")
                         
         layout.separator()
 
@@ -515,47 +528,81 @@ class SEQUENCER_MT_marker(Menu):
             layout.prop(st, "use_marker_sync")
 
 
+class SEQUENCER_MT_navigation_play(Menu):
+    bl_label = "Toggle Play"
+
+    def draw(self, context):
+        layout = self.layout
+        
+        layout.operator("screen.animation_play", text="Forward", icon = "PLAY")  
+        props = layout.operator("screen.animation_play", text="Reverse", icon = "PLAY_REVERSE")
+        props.reverse = True 
+        
+class SEQUENCER_MT_navigation_frame(Menu):
+    bl_label = "Frame"
+
+    def draw(self, context):
+        layout = self.layout  
+
+        props = layout.operator("screen.frame_offset", text="Previous")
+        props.delta = -1
+        props = layout.operator("screen.frame_offset", text="Next")
+        props.delta = 1        
+       
+class SEQUENCER_MT_navigation_cut(Menu):
+    bl_label = "Cut"
+
+    def draw(self, context):
+        layout = self.layout 
+
+        props = layout.operator("sequencer.strip_jump", text="Previous")
+        props.next = False
+        props.center = False
+        props = layout.operator("sequencer.strip_jump", text="Next")
+        props.next = True
+        props.center = False         
+
+class SEQUENCER_MT_navigation_strip(Menu):
+    bl_label = "Strip"
+
+    def draw(self, context):
+        layout = self.layout 
+        
+        props = layout.operator("sequencer.strip_jump", text="Previous")
+        props.next = False
+        props.center = True
+        props = layout.operator("sequencer.strip_jump", text="Next")
+        props.next = True
+        props.center = True              
+
+class SEQUENCER_MT_navigation_keyframe(Menu):
+    bl_label = "Keyframe"
+
+    def draw(self, context):
+        layout = self.layout 
+        
+        props = layout.operator("screen.keyframe_jump", text="Previous", icon = "PREV_KEYFRAME")
+        props.next = False
+        props = layout.operator("screen.keyframe_jump", text="Next", icon = "NEXT_KEYFRAME")
+        props.next = True
+
 class SEQUENCER_MT_navigation(Menu):
     bl_label = "Navigation"
 
     def draw(self, context):
         layout = self.layout
+              
+        layout.menu("SEQUENCER_MT_navigation_play")
         
-        layout.operator("screen.animation_play", text="Toggle Play")#, icon = "PLAY")  
-        props = layout.operator("screen.animation_play", text="Toggle Play Reverse")#, icon = "PLAY_REVERSE")
-        props.reverse = True                
-
         layout.separator()
         
-        props = layout.operator("screen.frame_offset", text="Previous frame")
-        props.delta = -1
-        props = layout.operator("screen.frame_offset", text="Next Frame")
-        props.delta = 1
+        layout.menu("SEQUENCER_MT_navigation_frame")
 
-        layout.separator()   
+        layout.menu("SEQUENCER_MT_navigation_cut")
 
-        props = layout.operator("sequencer.strip_jump", text="Previous Cut")
-        props.next = False
-        props.center = False
-        props = layout.operator("sequencer.strip_jump", text="Next Cut")
-        props.next = True
-        props.center = False
+        layout.menu("SEQUENCER_MT_navigation_strip")
 
-        layout.separator()
-
-        props = layout.operator("sequencer.strip_jump", text="Previous Strip")
-        props.next = False
-        props.center = True
-        props = layout.operator("sequencer.strip_jump", text="Next Strip")
-        props.next = True
-        props.center = True
-
-        layout.separator()
-        
-        props = layout.operator("screen.keyframe_jump", text="Previous Keyframe", icon = "PREV_KEYFRAME")
-        props.next = False
-        props = layout.operator("screen.keyframe_jump", text="Next Keyframe", icon = "NEXT_KEYFRAME")
-        props.next = True
+        layout.menu("SEQUENCER_MT_navigation_keyframe")
 
         layout.separator()
         
@@ -564,6 +611,9 @@ class SEQUENCER_MT_navigation(Menu):
         props = layout.operator("screen.frame_jump", text="End", icon = "FF")
         props.end = True
 
+        layout.separator()   
+
+        layout.operator("sequencer.jogshuttle", text="Jog/Shuttle")
 
 class SEQUENCER_MT_add(Menu):
     bl_label = "Add"
@@ -791,6 +841,9 @@ class SEQUENCER_MT_strip_mute(Menu):
 
         layout.operator("sequencer.mute", text="Mute/Hide").unselected = False
         layout.operator("sequencer.unmute", text="Un-Mute/Un-Hide").unselected = False
+
+        layout.separator()
+        
         layout.operator("sequencer.mute", text="Mute/Hide Deselected").unselected = True
         layout.operator("sequencer.unmute", text="Un-Mute/Un-Hide Deselected").unselected = True
         
@@ -843,40 +896,25 @@ class SEQUENCER_MT_strip(Menu):
                 layout.separator()
                 
                 layout.menu("SEQUENCER_MT_strip_effect") 
-
-                layout.separator()
-
-                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")                               
+                           
             elif stype in {'MOVIE'}:
                 
                 layout.separator()               
 
-                layout.menu("SEQUENCER_MT_strip_movie")                                                           
-
-                layout.separator()
-
-                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")                
+                layout.menu("SEQUENCER_MT_strip_movie")                                                                         
                                
             elif stype in {'IMAGE'}:
                 
                 layout.separator()
                 
                 layout.operator("sequencer.rendersize")
-                layout.operator("sequencer.images_separate")
-
-                layout.separator()
-
-                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")                
+                layout.operator("sequencer.images_separate")          
                 
             elif stype == 'META':
                 
-                layout.separator()
+                #layout.separator()
 
-                layout.operator("sequencer.meta_separate", text = "Un-Meta")
-
-                layout.separator()
-
-                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")                
+                layout.operator("sequencer.meta_separate", text = "Un-Meta")          
                         
             elif stype == 'SOUND':
                 st = context.space_data
@@ -889,10 +927,14 @@ class SEQUENCER_MT_strip(Menu):
                     #layout.prop(strip, "show_waveform") # only for active strip, but with checkbox.
                     layout.operator("sequencer.show_waveform_selected_sounds", text = "Toggle Draw Waveform")
 
-        layout.separator()
-        
-        layout.operator("sequencer.toggle_all_modifiers", text ="Toggle All Modifiers")
-                                
+        if stype != 'SOUND':
+
+            layout.separator()
+
+            layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")  
+            layout.operator("sequencer.strip_modifier_copy", text = "Apply Modifiers to Selection")
+            layout.operator("sequencer.toggle_all_modifiers", text ="Toggle All Modifiers")
+                                    
         layout.separator()
                 
         #layout.operator("sequencer.offset_clear") #Replaced by match frame
@@ -1715,7 +1757,8 @@ classes = (
     SEQUENCER_MT_select_cursor,    
     SEQUENCER_MT_select_handle, 
     SEQUENCER_MT_select_channel,
-    SEQUENCER_MT_select_Mouse,           
+    SEQUENCER_MT_select_Mouse, 
+    SEQUENCER_MT_select_linked,              
     SEQUENCER_MT_select,
     SEQUENCER_MT_add,
     SEQUENCER_MT_add_effect,
@@ -1733,7 +1776,12 @@ classes = (
     SEQUENCER_MT_strip_input,
     SEQUENCER_MT_strip_mute,
     SEQUENCER_MT_strip_effect,
-    SEQUENCER_MT_navigation,    
+    SEQUENCER_MT_navigation,
+    SEQUENCER_MT_navigation_play,
+    SEQUENCER_MT_navigation_frame,
+    SEQUENCER_MT_navigation_cut,  
+    SEQUENCER_MT_navigation_strip,
+    SEQUENCER_MT_navigation_keyframe,  
     SEQUENCER_MT_marker,    
     SEQUENCER_PT_edit,
     SEQUENCER_PT_effect,

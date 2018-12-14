@@ -621,6 +621,7 @@ keyconfig_data = \
       },
      ),
     ("sequencer.concatenate", {"type": 'V', "value": 'PRESS', "shift": True}, None),
+    ("sequencer.jogshuttle", {"type": 'J', "value": 'PRESS'}, None),
     ],
    },
   ),
