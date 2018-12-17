@@ -1541,7 +1541,7 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
                 split.alignment = 'RIGHT'
                 split.label(text="Original Frame Range")
                 split.alignment = 'LEFT'
-                layout.label(text="%d-%d (%d)" % (sta, end, end - sta + 1), translate=False)
+                split.label(text="%d-%d (%d)" % (sta, end, end - sta + 1), translate=False)
 
 
 class SEQUENCER_PT_filter(SequencerButtonsPanel, Panel):
