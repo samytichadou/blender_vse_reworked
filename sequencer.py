@@ -844,7 +844,7 @@ class SEQUENCER_OT_Split(bpy.types.Operator):
                 if s.select:    #only cut selected  
                     bpy.ops.sequencer.select_all(action='DESELECT') 
                     s.select = True
-                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = self.type)                                            
+                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = self.type, side='BOTH')                                            
                     bpy.ops.sequencer.select_all(action='DESELECT')                        
                     for s in selection: s.select = True     
                                   
@@ -853,7 +853,8 @@ class SEQUENCER_OT_Split(bpy.types.Operator):
                 s.select = True
                 bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = self.type)                 
                 bpy.ops.sequencer.select_all(action='DESELECT')                       
-                for s in selection: s.select = True         
+                for s in selection: s.select = True   
+                      
         return {'FINISHED'}   
 
 
@@ -1020,6 +1021,44 @@ class Sequencer_OT_JogShuttle(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
+class SEQUENCER_OT_SplitMode(bpy.types.Operator):
+    """Left mouse to split. Right mouse to finish."""
+    bl_idname = "sequencer.split_mode"
+    bl_label = "Split Mode..."
+
+    def execute(self, context):
+        region = context.region
+        x, y = region.view2d.region_to_view(*self.mouse_path[-1] )
+        context.scene.frame_set(x)        
+
+    def modal(self, context, event):
+        context.area.tag_redraw()
+        region = context.region
+
+        if event.type == 'MOUSEMOVE':
+            self.mouse_path.append((event.mouse_region_x, event.mouse_region_y))
+            self.execute(context)            
+
+        elif event.type == 'LEFTMOUSE':
+
+            bpy.ops.sequencer.split(type = 'SOFT')
+
+        elif event.type == 'RIGHTMOUSE':
+            
+            return {'FINISHED'}
+
+        elif event.type =='ESC':
+            
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+
+        args = (self, context)
+        self.mouse_path = []
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
 
 classes = (
     SEQUENCER_OT_CrossfadeSounds,
@@ -1048,4 +1087,5 @@ classes = (
     SEQUENCER_OT_Move,
     SEQUENCER_OT_Concatenate,
     Sequencer_OT_JogShuttle,
+    SEQUENCER_OT_SplitMode,
 )
