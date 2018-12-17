@@ -623,7 +623,7 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
                     if seqs[1].type in {
                     'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
                     'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 'COLORMIX',
                     #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:   
                         seqs[1].select=True  
@@ -638,7 +638,7 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
                     if s.type not in {
                     'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
                     'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 'COLORMIX',
                     #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:
                         s.frame_start += distance                   
@@ -711,7 +711,7 @@ class SEQUENCER_OT_Move(bpy.types.Operator):
             if not s.lock and s.type not in {
                     'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
                     'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+                    'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 'COLORMIX',
                     #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
                     }:
                 current_start = s.frame_final_start 
@@ -765,7 +765,7 @@ class SEQUENCER_OT_MatchFrame(bpy.types.Operator):
             if seq.type not in {
             'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
             'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 'COLORMIX',
             #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
             }:
                  
@@ -888,7 +888,7 @@ class SEQUENCER_OT_ExtendToFill(bpy.types.Operator):
             if strip.lock == False and strip.type not in {
             'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
             'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 'COLORMIX',
             #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
             }:           
       
@@ -947,7 +947,7 @@ class SEQUENCER_OT_Concatenate(bpy.types.Operator):
             if strip.lock == False and strip.type not in {
             'CROSS', 'ADD', 'SUBTRACT', 'ALPHA_OVER', 'ALPHA_UNDER',
             'GAMMA_CROSS', 'MULTIPLY', 'OVER_DROP', 'WIPE', 'GLOW',
-            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 
+            'TRANSFORM', 'SPEED', 'GAUSSIAN_BLUR', 'COLORMIX',
             #'TEXT', 'COLOR', 'ADJUSTMENT', 'MULTICAM',
             }:           
       
@@ -992,7 +992,7 @@ class Sequencer_OT_JogShuttle(bpy.types.Operator):
         end_frame = scn.frame_end
         duration = end_frame - start_frame
         diff = self.x - self.init_x
-        diff /= 0.5
+        diff /= 0.3
         diff = int(diff)
         extended_frame = diff + (self.init_current_frame - start_frame)
         looped_frame = extended_frame % (duration + 1)
