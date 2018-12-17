@@ -1050,8 +1050,8 @@ class SEQUENCER_PT_edit(SequencerButtonsPanel, Panel):
             #strip = act_strip(context)
             sound = strip.sound
 
-            col = layout.column(align=True)
-            #col.prop(strip, "volume")            
+            col = layout.column()
+            #col.prop(strip, "volume")
             row = col.row(align=True)
             sub = row.row(align=True)
             sub.active = (not strip.mute)
@@ -1424,8 +1424,10 @@ class SEQUENCER_PT_mask(SequencerButtonsPanel, Panel):
 
 
 class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
-    bl_label = "Data"
+    bl_label = "Advanced Edit Strip"
     bl_category = "Strip"
+    bl_parent_id = "SEQUENCER_PT_edit"
+    bl_options = {'DEFAULT_CLOSED'}
 
     @classmethod
     def poll(cls, context):
@@ -1456,38 +1458,49 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
 
         sub = col.column(align=True)
         sub.enabled = not strip.lock
-        sub.prop(strip, "frame_start")
-        sub.prop(strip, "frame_final_duration")
+        sub.prop(strip, "frame_start", text="Start ("+str(bpy.utils.smpte_from_frame(strip.frame_start))+")" )
+        sub.prop(strip, "frame_final_end", text="End ("+str(bpy.utils.smpte_from_frame(strip.frame_final_end))+")" )
+        sub.prop(strip, "frame_final_duration", text="Duration ("+str(bpy.utils.smpte_from_frame(strip.frame_final_duration))+")" )
         
         if not isinstance(strip, bpy.types.EffectSequence):
             layout.alignment = 'RIGHT'
             layout = layout.column(align=True)
+            layout.prop(strip, "frame_offset_start", text="Soft Trim Start")
+            layout.prop(strip, "frame_offset_end", text="End")
+
+            layout = layout.column(align=False)
+            layout.alignment = 'RIGHT'
+            layout = layout.column(align=True)
             layout.prop(strip, "animation_offset_start", text="Hard Trim Start")
             layout.prop(strip, "animation_offset_end", text="End")
-
-        layout = layout.column(align=False)
-        layout.alignment = 'RIGHT'
-        layout = layout.column(align=True)
-        layout.prop(strip, "frame_offset_start", text="Soft Trim Start")
-        layout.prop(strip, "frame_offset_end", text="End")        
         
-        col = layout.column(align=True)
-        col.alignment = 'RIGHT'
-
-        col.label(text="Begin       %s   %s" % ((bpy.utils.smpte_from_frame(strip.frame_start)).rjust(12), 
-                  str(strip.frame_start).rjust(6)))
-                  
-        col.label(text="End          %s   %s" % ((bpy.utils.smpte_from_frame(strip.frame_final_end)).rjust(12), 
-                  str(strip.frame_final_end).rjust(6)))
+        #col = layout.column(align=True)
+        #split = col.split(factor=0.5)
+        #split.alignment = 'RIGHT'
+        #split.label(text="Begin")
+        #split.alignment = 'LEFT'
+        #split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(strip.frame_start)), str(strip.frame_start)))
         
-        col.label(text="Duration  %s   %s" % ((bpy.utils.smpte_from_frame(strip.frame_final_duration)).rjust(12), 
-                  str(strip.frame_final_duration).rjust(6)))
+        #split = col.split(factor=0.5)
+        #split.alignment = 'RIGHT'
+        #split.label(text="End")
+        #split.alignment = 'LEFT'
+        #split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(strip.frame_final_end)), str(strip.frame_final_end)))
+        
+        #split = col.split(factor=0.5)
+        #split.alignment = 'RIGHT'
+        #split.label(text="Duration")
+        #split.alignment = 'LEFT'
+        #split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(strip.frame_final_duration)), str(strip.frame_final_duration)))
 
         playhead = frame_current - strip.frame_start
-        sub = col.column()
-        sub.alignment = 'RIGHT'
-        sub.active = (frame_current >= strip.frame_start and frame_current <= strip.frame_start + strip.frame_final_duration)
-        sub.label(text="Playhead  %s   %s" % ((bpy.utils.smpte_from_frame(playhead)).rjust(12), (str(playhead)).rjust(6, " ")))
+        col = layout.column(align=True)
+        col.active = (frame_current >= strip.frame_start and frame_current <= strip.frame_start + strip.frame_final_duration)
+        split = col.split(factor=0.5)
+        split.alignment = 'RIGHT'
+        split.label(text="Playhead")
+        split.alignment = 'LEFT'
+        split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(playhead)), (str(playhead))))
 
         ''' Old data - anyone missing this data?
         row.label(text=iface_("Final Length: %s") % bpy.utils.smpte_from_frame(strip.frame_final_duration),
@@ -1509,20 +1522,26 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
             elem = strip.elements[0]
 
         if strip.type != "SOUND":
+            split = col.split(factor=0.5)
+            split.alignment = 'RIGHT'
+            split.label(text="Original Resolution")
+            split.alignment = 'LEFT'
             if elem and elem.orig_width > 0 and elem.orig_height > 0:
-                col.label(text=iface_("Original Resolution: %dx%d") % (elem.orig_width, elem.orig_height), translate=False)
+                split.label(text="%dx%d" % (elem.orig_width, elem.orig_height), translate=False)
             else:
-                col.label(text="Original Resolution: None")        
+                split.label(text="None")
 
         if strip.type == "SCENE":
-
             scene = strip.scene
 
             if scene:
                 sta = scene.frame_start
                 end = scene.frame_end
-                layout.alignment = 'RIGHT'
-                layout.label(text=iface_("Original frame range: %d-%d (%d)") % (sta, end, end - sta + 1), translate=False)
+                split = col.split(factor=0.5)
+                split.alignment = 'RIGHT'
+                split.label(text="Original Frame Range")
+                split.alignment = 'LEFT'
+                layout.label(text="%d-%d (%d)" % (sta, end, end - sta + 1), translate=False)
 
 
 class SEQUENCER_PT_filter(SequencerButtonsPanel, Panel):
