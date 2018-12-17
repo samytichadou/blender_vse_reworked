@@ -19,6 +19,7 @@
 # <pep8 compliant>
 
 import bpy
+import time
 from bpy.types import Operator
 from operator import attrgetter
 from bpy.props import (
@@ -1039,7 +1040,7 @@ class SEQUENCER_OT_SplitMode(bpy.types.Operator):
             self.mouse_path.append((event.mouse_region_x, event.mouse_region_y))
             self.execute(context)            
 
-        elif event.type == 'LEFTMOUSE':
+        elif event.type == 'LEFTMOUSE' and event.value == 'PRESS':
 
             bpy.ops.sequencer.split(type = 'SOFT')
 
