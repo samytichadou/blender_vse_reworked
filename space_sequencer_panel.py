@@ -996,10 +996,9 @@ class SEQUENCER_PT_edit(SequencerButtonsPanel, Panel):
         strip = act_strip(context)
 
         row = layout.row(align=True)
-        row.prop(strip, "name", text="")
-        row.prop(strip, "lock", toggle=True, icon_only=True)            
-
-        layout.prop(strip, "type", text="Type")
+        #row.prop(strip, "type", text="")
+        row.prop(strip, "name", text="Name ("+strip.type.title()+")")
+        row.prop(strip, "lock", toggle=True, icon_only=True)
 
         if strip.type != 'SOUND':
 
@@ -1442,56 +1441,57 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
         
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = True
+        layout.use_property_split = False
         layout.use_property_decorate = False  # No animation.
 
         scene = context.scene
         frame_current = scene.frame_current
         strip = act_strip(context)
 
-        col = layout.column(align=True)
-        row = col.row(align=True)
-
-        row_sub = row.row(align=True)
-        row_sub.enabled = not strip.lock
-        row_sub.prop(strip, "channel")
-
-        sub = col.column(align=True)
+        sub = layout.row(align=True)
         sub.enabled = not strip.lock
-        sub.prop(strip, "frame_start", text="Start ("+str(bpy.utils.smpte_from_frame(strip.frame_start))+")" )
-        sub.prop(strip, "frame_final_end", text="End ("+str(bpy.utils.smpte_from_frame(strip.frame_final_end))+")" )
-        sub.prop(strip, "frame_final_duration", text="Duration ("+str(bpy.utils.smpte_from_frame(strip.frame_final_duration))+")" )
-        
+        split = sub.split(factor=0.5)
+        split.alignment = 'RIGHT'
+        split.label(text='Channel')
+        split.prop(strip, "channel", text="")
+
+        sub = layout.column(align=True)
+        sub.enabled = not strip.lock
+        split = sub.split(factor=0.5)
+        split.alignment = 'RIGHT'
+        split.label(text="Start")
+        split.prop(strip, "frame_start", text=str(bpy.utils.smpte_from_frame(strip.frame_start)).replace(':', '.'))
+        split = sub.split(factor=0.5)
+        split.alignment = 'RIGHT'
+        split.label(text="End")
+        split.prop(strip, "frame_final_end", text=str(bpy.utils.smpte_from_frame(strip.frame_final_end)).replace(':', '.'))
+        split = sub.split(factor=0.5)
+        split.alignment = 'RIGHT'
+        split.label(text="Duration")
+        split.prop(strip, "frame_final_duration", text=str(bpy.utils.smpte_from_frame(strip.frame_final_duration)).replace(':', '.'))
+
         if not isinstance(strip, bpy.types.EffectSequence):
             layout.alignment = 'RIGHT'
-            layout = layout.column(align=True)
-            layout.prop(strip, "frame_offset_start", text="Soft Trim Start")
-            layout.prop(strip, "frame_offset_end", text="End")
+            sub = layout.column(align=True)
+            split = sub.split(factor=0.5, align=True)
+            split.alignment = 'RIGHT'
+            split.label(text="Soft Trim Start")
+            split.prop(strip, "frame_offset_start", text=str(bpy.utils.smpte_from_frame(strip.frame_offset_start)).replace(':', '.'))
+            split = sub.split(factor=0.5, align=True)
+            split.alignment = 'RIGHT'
+            split.label(text='End')
+            split.prop(strip, "frame_offset_end", text=str(bpy.utils.smpte_from_frame(strip.frame_offset_end)).replace(':', '.'))
 
-            layout = layout.column(align=False)
             layout.alignment = 'RIGHT'
-            layout = layout.column(align=True)
-            layout.prop(strip, "animation_offset_start", text="Hard Trim Start")
-            layout.prop(strip, "animation_offset_end", text="End")
-        
-        #col = layout.column(align=True)
-        #split = col.split(factor=0.5)
-        #split.alignment = 'RIGHT'
-        #split.label(text="Begin")
-        #split.alignment = 'LEFT'
-        #split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(strip.frame_start)), str(strip.frame_start)))
-        
-        #split = col.split(factor=0.5)
-        #split.alignment = 'RIGHT'
-        #split.label(text="End")
-        #split.alignment = 'LEFT'
-        #split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(strip.frame_final_end)), str(strip.frame_final_end)))
-        
-        #split = col.split(factor=0.5)
-        #split.alignment = 'RIGHT'
-        #split.label(text="Duration")
-        #split.alignment = 'LEFT'
-        #split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(strip.frame_final_duration)), str(strip.frame_final_duration)))
+            sub = layout.column(align=True)
+            split = sub.split(factor=0.5)
+            split.alignment = 'RIGHT'
+            split.label(text="Hard Trim Start")
+            split.prop(strip, "animation_offset_start", text=str(bpy.utils.smpte_from_frame(strip.animation_offset_start)).replace(':', '.'))
+            split = sub.split(factor=0.5, align=True)
+            split.alignment = 'RIGHT'
+            split.label(text='End')
+            split.prop(strip, "animation_offset_end", text=str(bpy.utils.smpte_from_frame(strip.animation_offset_end)).replace(':', '.'))
 
         playhead = frame_current - strip.frame_start
         col = layout.column(align=True)
@@ -1500,16 +1500,9 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
         split.alignment = 'RIGHT'
         split.label(text="Playhead")
         split.alignment = 'LEFT'
-        split.label(text="%s (%s)" % ((bpy.utils.smpte_from_frame(playhead)), (str(playhead))))
+        split.label(text="%s:  %s" % ((bpy.utils.smpte_from_frame(playhead)), (str(playhead))))
 
         ''' Old data - anyone missing this data?
-        row.label(text=iface_("Final Length: %s") % bpy.utils.smpte_from_frame(strip.frame_final_duration),
-                  translate=False)
-        row = col.row(align=True)
-        row.alignment = 'RIGHT'
-        row.active = (frame_current >= strip.frame_start and frame_current <= strip.frame_start + strip.frame_duration)
-        row.label(text=iface_("Playhead: %d") % (frame_current - strip.frame_start), translate=False)
-
         col.label(text=iface_("Frame Offset %d:%d") % (strip.frame_offset_start, strip.frame_offset_end),
                   translate=False)
         col.label(text=iface_("Frame Still %d:%d") % (strip.frame_still_start, strip.frame_still_end), translate=False)'''
