@@ -635,7 +635,7 @@ class SEQUENCER_MT_add(Menu):
         if len(bpy.data.scenes) > 10:
             layout.operator_context = 'INVOKE_DEFAULT'
             layout.operator("sequencer.scene_strip_add", text="Scene...", icon='SCENE_DATA')
-        elif len(bpy.data.scenes) > 1:
+        elif len(bpy.data.scenes) > 0:
             layout.operator_menu_enum("sequencer.scene_strip_add", "scene", text="Scene", icon='SCENE_DATA')
         else:
             layout.menu("SEQUENCER_MT_add_empty", text="Scene", icon='SCENE_DATA')
@@ -643,7 +643,7 @@ class SEQUENCER_MT_add(Menu):
         if len(bpy.data.movieclips) > 10:
             layout.operator_context = 'INVOKE_DEFAULT'
             layout.operator("sequencer.movieclip_strip_add", text="Clip...", icon='CLIP')
-        elif len(bpy.data.movieclips) > 1:
+        elif len(bpy.data.movieclips) > 0:
             layout.operator_menu_enum("sequencer.movieclip_strip_add", "clip", text="Clip", icon='CLIP')
         else:
             layout.menu("SEQUENCER_MT_add_empty", text="Clip", icon='CLIP')
@@ -651,7 +651,7 @@ class SEQUENCER_MT_add(Menu):
         if len(bpy.data.masks) > 10:
             layout.operator_context = 'INVOKE_DEFAULT'
             layout.operator("sequencer.mask_strip_add", text="Mask...", icon='MOD_MASK')
-        elif len(bpy.data.masks) > 1:
+        elif len(bpy.data.masks) > 0:
             layout.operator_menu_enum("sequencer.mask_strip_add", "mask", text="Mask", icon='MOD_MASK')
         else:
             layout.menu("SEQUENCER_MT_add_empty", text="Mask", icon='MOD_MASK')
