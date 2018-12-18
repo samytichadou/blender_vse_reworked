@@ -621,7 +621,6 @@ keyconfig_data = \
       },
      ),
     ("sequencer.concatenate", {"type": 'V', "value": 'PRESS', "shift": True}, None),
-    ("sequencer.jogshuttle", {"type": 'J', "value": 'PRESS'}, None),
     ("sequencer.split_mode", {"type": 'B', "value": 'PRESS', "ctrl": True}, None),
     ("wm.call_menu",
      {"type": 'B', "value": 'PRESS', "alt": True},
@@ -630,13 +629,14 @@ keyconfig_data = \
        ],
       },
      ),
-    ],
-   },
-  ),
- ]
-
-
-if __name__ == "__main__":
-    import os
-    from bl_keymap_utils.io import keyconfig_import_from_data
-    keyconfig_import_from_data(os.path.splitext(os.path.basename(__file__))[0], keyconfig_data)
+    ("sequencer.view_channel",
+     {"type": 'A', "value": 'PRESS', "shift": True, "alt": True},
+     {"properties":
+      [("type", 'ALL'),
+       ],
+      },
+     ),
+    ("sequencer.view_channel",
+     {"type": 'S', "value": 'PRESS', "shift": True, "alt": True},
+     {"properties":
+      [
