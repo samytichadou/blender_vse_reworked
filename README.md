@@ -26,6 +26,10 @@ A working suggestion for reworking the Blender 2.80 VSE menus and additional fun
 - Extend to fill
 - Move in Steps(+swap left/right)
 - Concatenate
+- View Channel Solo
+- Split Mode(Razor Tool)
+
+
 
 ### Existing functions added to menu:
 
