@@ -1057,21 +1057,20 @@ class SEQUENCER_OT_ViewChannel(Operator):
 
     def execute(self, context):        
         strip = context.scene.sequence_editor.active_strip
-        #if strip is None:
-        #    return
-        
-        previews = [a.spaces.active for a in bpy.context.screen.areas
-                if a.type == 'SEQUENCE_EDITOR'
-                and a.spaces.active.view_type == 'PREVIEW']
-        for s in previews:
-            if self.type == "SOLO":
-                s.display_channel = strip.channel
-            else:
-                s.display_channel = 0  
+
+        if self.type == "SOLO":
+            bpy.ops.sequencer.select_all(action='DESELECT') 
+            bpy.ops.sequencer.unmute(unselected=False)
+            bpy.ops.sequencer.unmute(unselected=True)
+            strip.select = True
+            bpy.ops.sequencer.select_channel()
+            bpy.ops.sequencer.mute(unselected=True)
+        else:
+            bpy.ops.sequencer.select_all(action='DESELECT') 
+            bpy.ops.sequencer.unmute(unselected=True)
+            bpy.ops.sequencer.unmute(unselected=False)                
 
         return {'FINISHED'}              
-
-
 
 classes = (
     SEQUENCER_OT_CrossfadeSounds,
