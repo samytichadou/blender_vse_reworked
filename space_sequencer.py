@@ -259,6 +259,15 @@ class SEQUENCER_MT_view_preview(Menu):
         layout.operator("sequencer.set_preview_range", text = "Set Out").type = "OUT"
 
 
+class SEQUENCER_MT_view_channel(Menu):
+    bl_label = "Channel"
+
+    def draw(self, context):
+        layout = self.layout
+        
+        layout.operator("sequencer.view_channel", text = "Solo").type = "SOLO"
+        layout.operator("sequencer.view_channel", text = "All").type = "ALL"
+
 class SEQUENCER_MT_view(Menu):
     bl_label = "View"
 
@@ -284,7 +293,9 @@ class SEQUENCER_MT_view(Menu):
             
             layout.menu("SEQUENCER_MT_view_zoom")
             
-            layout.menu("SEQUENCER_MT_view_preview")          
+            layout.menu("SEQUENCER_MT_view_preview")   
+            
+            layout.menu("SEQUENCER_MT_view_channel")       
             
             layout.operator_context = 'INVOKE_DEFAULT'
             
@@ -620,9 +631,6 @@ class SEQUENCER_MT_navigation(Menu):
         props = layout.operator("screen.frame_jump", text="End", icon = "FF")
         props.end = True
 
-        layout.separator()   
-
-        layout.operator("sequencer.jogshuttle", text="Jog/Shuttle")
 
 class SEQUENCER_MT_add(Menu):
     bl_label = "Add"
@@ -1759,7 +1767,8 @@ classes = (
     SEQUENCER_MT_view,    
     SEQUENCER_MT_view_render,               
     SEQUENCER_MT_view_toggle,
-    SEQUENCER_MT_view_frame,    
+    SEQUENCER_MT_view_frame, 
+    SEQUENCER_MT_view_channel,   
     SEQUENCER_MT_preview_zoom, 
     SEQUENCER_MT_view_zoom, 
     SEQUENCER_MT_view_preview,          
