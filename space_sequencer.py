@@ -1196,8 +1196,8 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
             # The multicam strip needs at least 2 strips to be useful
             if strip_channel > 2:
                 BT_ROW = 4
-                col.alignment = "RIGHT"
-                col.label(text="Cut To")
+                #col.alignment = "RIGHT"
+                col.label(text="    Cut to")
                 row = col.row()
 
                 for i in range(1, strip_channel):
@@ -1673,12 +1673,17 @@ class SEQUENCER_PT_proxy(SequencerButtonsPanel, Panel):
                 if proxy.use_proxy_custom_file:
                     flow.prop(proxy, "filepath")
 
+            layout = layout.box()
             row = layout.row(align=True)
             row.prop(strip.proxy, "build_25", toggle=True)
             row.prop(strip.proxy, "build_75", toggle=True)
             row = layout.row(align=True)
             row.prop(strip.proxy, "build_50", toggle=True)
             row.prop(strip.proxy, "build_100", toggle=True)
+
+            layout = self.layout
+            layout.use_property_split = True
+            layout.use_property_decorate = False  # No animation.
 
             layout.prop(proxy, "use_overwrite")
 
@@ -1687,9 +1692,8 @@ class SEQUENCER_PT_proxy(SequencerButtonsPanel, Panel):
 
             if strip.type == 'MOVIE':
                 col = layout.column()
-                col.label(text="Use timecode index")
 
-                col.prop(proxy, "timecode")
+                col.prop(proxy, "timecode", text = "Timecode Index")
 
         col = layout.column()
         col.operator("sequencer.enable_proxies")
