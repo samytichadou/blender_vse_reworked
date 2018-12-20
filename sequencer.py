@@ -224,6 +224,14 @@ class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
     bl_idname = "sequencer.select_time_cursor"
     bl_label = "Select Current Frame"
     bl_options = {"REGISTER", "UNDO"}
+
+    extent: EnumProperty(
+        name="Extent", description="Extent",
+        items=(
+            ('TRUE', "True", "Extent True"),
+            ('FALSE', "False", "Extent False"),
+        ),
+    )
     
     @classmethod
     def poll(cls, context):
@@ -235,6 +243,7 @@ class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
         lockNum = 0                                     
         lockSelNum = 0                                      
         reportMessage = ""
+        if self.extent == "FALSE": bpy.ops.sequencer.select_all(action='DESELECT')
         for strip in bpy.context.sequences:
             if strip.lock and strip.select:                         
                 lockSelNum += 1
@@ -483,6 +492,7 @@ class SEQUENCER_OT_SplitExtract(bpy.types.Operator):
     bl_idname = "sequencer.split_extract"
     bl_label = "Split Extract"
     bl_options = {'REGISTER', 'UNDO'}
+    
     direction: EnumProperty(
         name="Direction", description="Split Extract Direction",
         items=(
@@ -599,7 +609,9 @@ class SEQUENCER_OT_RippleDelete(bpy.types.Operator):
         selection = sorted(selection, key=attrgetter('channel', 'frame_final_start'))
         
         if not selection:
-            return {'CANCELLED'}  
+            return {'CANCELLED'}
+        
+        #bpy.ops.sequencer.copy_strips() #copy to buffer - unsuccesful attempt
                             
         for seq in selection:
             if seq.lock == False:            
@@ -845,7 +857,11 @@ class SEQUENCER_OT_Split(bpy.types.Operator):
                 if s.select:    #only cut selected  
                     bpy.ops.sequencer.select_all(action='DESELECT') 
                     s.select = True
-                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = self.type, side='BOTH')                                            
+                    bpy.ops.sequencer.cut(frame=bpy.context.scene.frame_current, type = self.type, side='RIGHT')
+
+                                # add new strip to selection
+                    for i in bpy.context.scene.sequence_editor.sequences_all:
+                        if i.select: selection.append(i)                                                    
                     bpy.ops.sequencer.select_all(action='DESELECT')                        
                     for s in selection: s.select = True     
                                   
@@ -983,49 +999,18 @@ class SEQUENCER_OT_Concatenate(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class Sequencer_OT_JogShuttle(bpy.types.Operator):
-    bl_label = 'Jog/Shuttle'
-    bl_idname = 'sequencer.jogshuttle'
-    bl_description = 'Jog through current sequence'
-
-    def execute(self, context):
-        scn = context.scene
-        start_frame = scn.frame_start
-        end_frame = scn.frame_end
-        duration = end_frame - start_frame
-        diff = self.x - self.init_x
-        diff /= 0.3
-        diff = int(diff)
-        extended_frame = diff + (self.init_current_frame - start_frame)
-        looped_frame = extended_frame % (duration + 1)
-        target_frame = start_frame + looped_frame
-        context.scene.frame_current = target_frame
-
-    def modal(self, context, event):
-        if event.type == 'MOUSEMOVE':
-            self.x = event.mouse_x
-            self.execute(context)
-        elif event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
-        elif event.type in ('RIGHTMOUSE', 'ESC'):
-            return {'CANCELLED'}
-
-        return {'RUNNING_MODAL'}
-
-    def invoke(self, context, event):
-        scn = context.scene
-        self.x = event.mouse_x
-        self.init_x = self.x
-        self.init_current_frame = scn.frame_current
-        self.execute(context)
-        context.window_manager.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
-
-
 class SEQUENCER_OT_SplitMode(bpy.types.Operator):
     """Left mouse to split. Right mouse to finish."""
     bl_idname = "sequencer.split_mode"
     bl_label = "Split Mode..."
+
+    @classmethod
+    def poll(cls, context):
+        current_scene = context.scene
+        if current_scene and current_scene.sequence_editor:
+            return True
+        else:
+            return False
 
     def execute(self, context):
         region = context.region
@@ -1044,13 +1029,9 @@ class SEQUENCER_OT_SplitMode(bpy.types.Operator):
 
             bpy.ops.sequencer.split(type = 'SOFT')
 
-        elif event.type == 'RIGHTMOUSE':
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:
             
             return {'FINISHED'}
-
-        elif event.type =='ESC':
-            
-            return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
 
@@ -1060,6 +1041,46 @@ class SEQUENCER_OT_SplitMode(bpy.types.Operator):
         self.mouse_path = []
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
+
+
+class SEQUENCER_OT_ViewChannel(Operator):
+    """View all channels or active strip channel solo"""
+
+    bl_idname = "sequencer.view_channel"
+    bl_label = "View Channels or Solo"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    type: EnumProperty(
+        name="Type", description="View Channel Type",
+        items=(
+            ('ALL', "All", "View All Channels"),
+            ('SOLO', "Solo", "View Channel Solo"),
+        ),
+    )
+
+    @classmethod
+    def poll(cls, context):
+        if context.scene and context.scene.sequence_editor and context.scene.sequence_editor.active_strip:
+            return True
+        else:
+            return False
+
+    def execute(self, context):        
+        strip = context.scene.sequence_editor.active_strip
+
+        if self.type == "SOLO":
+            bpy.ops.sequencer.select_all(action='DESELECT') 
+            bpy.ops.sequencer.unmute(unselected=False)
+            bpy.ops.sequencer.unmute(unselected=True)
+            strip.select = True
+            bpy.ops.sequencer.select_channel()
+            bpy.ops.sequencer.mute(unselected=True)
+        else:
+            bpy.ops.sequencer.select_all(action='DESELECT') 
+            bpy.ops.sequencer.unmute(unselected=True)
+            bpy.ops.sequencer.unmute(unselected=False)                
+
+        return {'FINISHED'}              
 
 classes = (
     SEQUENCER_OT_CrossfadeSounds,
@@ -1087,6 +1108,6 @@ classes = (
     SEQUENCER_OT_ExtendToFill,  
     SEQUENCER_OT_Move,
     SEQUENCER_OT_Concatenate,
-    Sequencer_OT_JogShuttle,
     SEQUENCER_OT_SplitMode,
+    SEQUENCER_OT_ViewChannel,
 )
