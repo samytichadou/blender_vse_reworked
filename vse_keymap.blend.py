@@ -411,7 +411,7 @@ keyconfig_data = \
      ),
     ("sound.mixdown", {"type": 'F10', "value": 'PRESS', "shift": True}, None),
     ("sequencer.select",
-     {"type": 'F', "value": 'PRESS', "shift": True},
+     {"type": 'F', "value": 'PRESS', "alt": True},
      {"properties":
       [("left_right", 'RIGHT'),
        ("linked_time", True),
@@ -447,7 +447,13 @@ keyconfig_data = \
        ],
       },
      ),
-    ("sequencer.select_time_cursor", {"type": 'F', "value": 'PRESS'}, None),
+    ("sequencer.select_time_cursor",
+     {"type": 'F', "value": 'PRESS'},
+     {"properties":
+      [("extent", 'FALSE'),
+       ],
+      },
+     ),
     ("sequencer.select_active_side",
      {"type": 'C', "value": 'PRESS', "alt": True},
      {"properties":
@@ -640,6 +646,13 @@ keyconfig_data = \
      {"type": 'S', "value": 'PRESS', "ctrl": True, "alt": True},
      {"properties":
       [("type", 'SOLO'),
+       ],
+      },
+     ),
+    ("sequencer.select_time_cursor",
+     {"type": 'F', "value": 'PRESS', "shift": True},
+     {"properties":
+      [("extent", 'TRUE'),
        ],
       },
      ),
