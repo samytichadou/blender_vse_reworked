@@ -35,7 +35,11 @@ def act_strip(context):
 
 
 def draw_color_balance(layout, color_balance):
-    box = layout.box()
+    
+    flow = layout.grid_flow(row_major=True, columns=0, even_columns=True, even_rows=False, align=False)    
+    col = flow.column()
+    
+    box = col.box()    
     split = box.split(factor=0.35)
     col = split.column(align=True)
     col.label(text="Lift:")
@@ -45,7 +49,9 @@ def draw_color_balance(layout, color_balance):
     col.prop(color_balance, "invert_lift", text="Invert", icon='ARROW_LEFTRIGHT')
     split.template_color_picker(color_balance, "lift", value_slider=True, cubic=True)
 
-    box = layout.box()
+    col = flow.column()
+
+    box = col.box()
     split = box.split(factor=0.35)
     col = split.column(align=True)
     col.label(text="Gamma:")
@@ -55,7 +61,9 @@ def draw_color_balance(layout, color_balance):
     col.prop(color_balance, "invert_gamma", text="Invert", icon='ARROW_LEFTRIGHT')
     split.template_color_picker(color_balance, "gamma", value_slider=True, lock_luminosity=True, cubic=True)
 
-    box = layout.box()
+    col = flow.column()
+
+    box = col.box()
     split = box.split(factor=0.35)
     col = split.column(align=True)
     col.label(text="Gain:")
@@ -149,6 +157,7 @@ class SEQUENCER_MT_editor_menus(Menu):
             layout.menu("SEQUENCER_MT_select") 
             layout.menu("SEQUENCER_MT_add")           
             layout.menu("SEQUENCER_MT_edit") 
+            layout.menu("SEQUENCER_MT_split")
             layout.menu("SEQUENCER_MT_transform")                         
             layout.menu("SEQUENCER_MT_strip")
             layout.menu("SEQUENCER_MT_navigation")      
@@ -250,6 +259,15 @@ class SEQUENCER_MT_view_preview(Menu):
         layout.operator("sequencer.set_preview_range", text = "Set Out").type = "OUT"
 
 
+class SEQUENCER_MT_view_channel(Menu):
+    bl_label = "Channel"
+
+    def draw(self, context):
+        layout = self.layout
+        
+        layout.operator("sequencer.view_channel", text = "Solo").type = "SOLO"
+        layout.operator("sequencer.view_channel", text = "All").type = "ALL"
+
 class SEQUENCER_MT_view(Menu):
     bl_label = "View"
 
@@ -275,7 +293,9 @@ class SEQUENCER_MT_view(Menu):
             
             layout.menu("SEQUENCER_MT_view_zoom")
             
-            layout.menu("SEQUENCER_MT_view_preview")          
+            layout.menu("SEQUENCER_MT_view_preview")   
+            
+            layout.menu("SEQUENCER_MT_view_channel")       
             
             layout.operator_context = 'INVOKE_DEFAULT'
             
@@ -611,9 +631,6 @@ class SEQUENCER_MT_navigation(Menu):
         props = layout.operator("screen.frame_jump", text="End", icon = "FF")
         props.end = True
 
-        layout.separator()   
-
-        layout.operator("sequencer.jogshuttle", text="Jog/Shuttle")
 
 class SEQUENCER_MT_add(Menu):
     bl_label = "Add"
@@ -740,24 +757,28 @@ class SEQUENCER_MT_add_effect(Menu):
         col.enabled = selected_seq != 0
 
 
-class SEQUENCER_MT_edit_split(Menu):
+class SEQUENCER_MT_split(Menu):
     bl_label = "Split"
 
     def draw(self, context):
         layout = self.layout
 
-        layout.operator("sequencer.split", text="Soft").type = "SOFT"        
-        layout.operator("sequencer.split", text="Hard").type = "HARD"
+        layout.operator("sequencer.split", text = "Soft").type = "SOFT"        
+        layout.operator("sequencer.split", text = "Hard").type = "HARD"
 
         layout.separator()
         
-        layout.operator("sequencer.split_extract", text="Extract Left").direction = "LEFT"
-        layout.operator("sequencer.split_extract", text="Extract Right").direction = "RIGHT"         
+        layout.operator("sequencer.split_mode", text = "Mode...")       
+
+        layout.separator()
+                
+        layout.operator("sequencer.split_extract", text = "Extract Left").direction = "LEFT"
+        layout.operator("sequencer.split_extract", text = "Extract Right").direction = "RIGHT"         
  
         layout.separator()
         
-        layout.operator("sequencer.split_lift", text="Lift Left").direction = "LEFT"
-        layout.operator("sequencer.split_lift", text="Lift Right").direction = "RIGHT"       
+        layout.operator("sequencer.split_lift", text = "Lift Left").direction = "LEFT"
+        layout.operator("sequencer.split_lift", text = "Lift Right").direction = "RIGHT"       
 
 class SEQUENCER_MT_edit_remove(Menu):
     bl_label = "Cut"
@@ -776,10 +797,6 @@ class SEQUENCER_MT_edit(Menu):
         layout = self.layout
 
         layout.operator_context = 'INVOKE_REGION_WIN'
-
-        layout.menu("SEQUENCER_MT_edit_split")
-        
-        layout.separator()
 
         layout.menu("SEQUENCER_MT_edit_remove")         
         layout.operator("sequencer.copy", text="Copy", icon = "COPYDOWN")
@@ -1750,7 +1767,8 @@ classes = (
     SEQUENCER_MT_view,    
     SEQUENCER_MT_view_render,               
     SEQUENCER_MT_view_toggle,
-    SEQUENCER_MT_view_frame,    
+    SEQUENCER_MT_view_frame, 
+    SEQUENCER_MT_view_channel,   
     SEQUENCER_MT_preview_zoom, 
     SEQUENCER_MT_view_zoom, 
     SEQUENCER_MT_view_preview,          
@@ -1766,7 +1784,7 @@ classes = (
     SEQUENCER_MT_add_empty,
     SEQUENCER_MT_edit, 
     SEQUENCER_MT_edit_input,    
-    SEQUENCER_MT_edit_split, 
+    SEQUENCER_MT_split, 
     SEQUENCER_MT_edit_remove,        
     SEQUENCER_MT_transform,
     SEQUENCER_MT_transform_gaps,
