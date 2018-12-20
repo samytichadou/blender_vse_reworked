@@ -1240,10 +1240,10 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
             row.prop(strip, "location", text="Location")
             col.prop(strip, "wrap_width")
             sub = layout.column(align=True)
-            split = sub.split(factor=0.5, align=True)
+            split = sub.split(factor=0.495, align=True)
             split.alignment = 'RIGHT'
             split.label(text="Export Subtitles")
-            split.operator("sequencer.export_subtitles", icon='EXPORT')
+            split.operator("sequencer.export_subtitles", text="", icon='EXPORT')
 
         col = layout.column(align=True)
         if strip.type == 'SPEED':
@@ -1675,11 +1675,11 @@ class SEQUENCER_PT_proxy(SequencerButtonsPanel, Panel):
 
             layout = layout.box()
             row = layout.row(align=True)
-            row.prop(strip.proxy, "build_25", toggle=True)
-            row.prop(strip.proxy, "build_75", toggle=True)
+            row.prop(strip.proxy, "build_25")
+            row.prop(strip.proxy, "build_75")
             row = layout.row(align=True)
-            row.prop(strip.proxy, "build_50", toggle=True)
-            row.prop(strip.proxy, "build_100", toggle=True)
+            row.prop(strip.proxy, "build_50")
+            row.prop(strip.proxy, "build_100")
 
             layout = self.layout
             layout.use_property_split = True
@@ -1921,6 +1921,7 @@ classes = (
     SEQUENCER_PT_scene,
     SEQUENCER_PT_mask,
     SEQUENCER_PT_filter,
+    SEQUENCER_PT_data,
     SEQUENCER_PT_proxy,
     SEQUENCER_PT_preview,
     SEQUENCER_PT_view,
