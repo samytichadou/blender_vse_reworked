@@ -1187,8 +1187,8 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
 
             # The multicam strip needs at least 2 strips to be useful
             if strip_channel > 2:
-                BT_ROW = 2
-                #col.alignment = "RIGHT"
+                BT_ROW = 4
+                col.alignment = "RIGHT"
                 col.label(text="Cut To")
                 row = col.row()
 
@@ -1231,7 +1231,11 @@ class SEQUENCER_PT_effect(SequencerButtonsPanel, Panel):
             row = col.row(align=True)
             row.prop(strip, "location", text="Location")
             col.prop(strip, "wrap_width")
-            layout.operator("sequencer.export_subtitles", icon='EXPORT')
+            sub = layout.column(align=True)
+            split = sub.split(factor=0.5, align=True)
+            split.alignment = 'RIGHT'
+            split.label(text="Export Subtitles")
+            split.operator("sequencer.export_subtitles", icon='EXPORT')
 
         col = layout.column(align=True)
         if strip.type == 'SPEED':
