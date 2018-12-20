@@ -436,7 +436,7 @@ class SEQUENCER_MT_select_cursor(Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("sequencer.select_time_cursor", text="Current Frame").extent = False        
+        layout.operator("sequencer.select_time_cursor", text="Current Frame").extent = "FALSE"        
         props = layout.operator("sequencer.select", text="Left")
         props.left_right = 'LEFT'
         props.linked_time = True
