@@ -224,6 +224,14 @@ class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
     bl_idname = "sequencer.select_time_cursor"
     bl_label = "Select Current Frame"
     bl_options = {"REGISTER", "UNDO"}
+
+    extent: EnumProperty(
+        name="Extent", description="Extent",
+        items=(
+            ('TRUE', "True", "Extent True"),
+            ('FALSE', "False", "Extent False"),
+        ),
+    )
     
     @classmethod
     def poll(cls, context):
@@ -235,6 +243,7 @@ class SEQUENCER_OT_SelectTimeCursor(bpy.types.Operator):
         lockNum = 0                                     
         lockSelNum = 0                                      
         reportMessage = ""
+        if self.extent == "FALSE": bpy.ops.sequencer.select_all(action='DESELECT')
         for strip in bpy.context.sequences:
             if strip.lock and strip.select:                         
                 lockSelNum += 1
@@ -483,6 +492,7 @@ class SEQUENCER_OT_SplitExtract(bpy.types.Operator):
     bl_idname = "sequencer.split_extract"
     bl_label = "Split Extract"
     bl_options = {'REGISTER', 'UNDO'}
+    
     direction: EnumProperty(
         name="Direction", description="Split Extract Direction",
         items=(
