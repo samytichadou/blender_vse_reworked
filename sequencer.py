@@ -512,15 +512,21 @@ class SEQUENCER_OT_SplitExtract(bpy.types.Operator):
         selection = bpy.context.selected_sequences
         if not selection:
             return {'CANCELLED'}
-          
+
+        #Get current frame selection:
+        bpy.ops.sequencer.select_time_cursor(extent='FALSE')
+        cf_selection = bpy.context.selected_sequences
+        bpy.ops.sequencer.select_all(action='DESELECT') 
+
         for s in selection:
-            if not s.lock:
-                bpy.ops.sequencer.select_all(action='DESELECT') 
-                s.select = True
-                sequencer.cut(frame=scene.frame_current, type='SOFT', side=self.direction)
-                sequencer.ripple_delete()
-                s.select = False                        
-                for s in selection: s.select = True 
+            for i in cf_selection:            
+                if not s.lock and s == i:
+                    bpy.ops.sequencer.select_all(action='DESELECT') 
+                    s.select = True
+                    sequencer.cut(frame=scene.frame_current, type='SOFT', side=self.direction)
+                    sequencer.ripple_delete()  
+                    s.select = False                        
+        for s in selection: s.select = True 
 
         return {'FINISHED'}
 
@@ -546,16 +552,27 @@ class SEQUENCER_OT_SplitLift(bpy.types.Operator):
         return False
 
     def execute(self, context):
-        
+
+        scene = bpy.context.scene
+        sequencer = bpy.ops.sequencer        
         selection = bpy.context.selected_sequences
         if not selection:
             return {'CANCELLED'}
-                
-        scene = bpy.context.scene
-        sequencer = bpy.ops.sequencer
 
-        sequencer.cut(frame=scene.frame_current, type='SOFT', side=self.direction)
-        sequencer.delete_lift()
+        #Get current frame selection:
+        bpy.ops.sequencer.select_time_cursor(extent='FALSE')
+        cf_selection = bpy.context.selected_sequences
+        bpy.ops.sequencer.select_all(action='DESELECT') 
+
+        for s in selection:
+            for i in cf_selection:            
+                if not s.lock and s == i:
+                    bpy.ops.sequencer.select_all(action='DESELECT') 
+                    s.select = True
+                    sequencer.cut(frame=scene.frame_current, type='SOFT', side=self.direction)
+                    sequencer.delete_lift()  
+                    s.select = False                        
+        for s in selection: s.select = True 
 
         return {'FINISHED'}
 
