@@ -1482,24 +1482,28 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
         frame_current = scene.frame_current
         strip = act_strip(context)
 
+        length_list = [str(strip.frame_start), str(strip.frame_final_end), str(strip.frame_final_duration), str(strip.frame_offset_start), str(strip.frame_offset_end), str(strip.animation_offset_start), str(strip.animation_offset_end)]     
+        max_length = max(len(x) for x in length_list)
+        max_factor = (1.9-max_length)/30
+        
         sub = layout.row(align=True)
         sub.enabled = not strip.lock
-        split = sub.split(factor=0.5)
+        split = sub.split(factor=0.5+max_factor)
         split.alignment = 'RIGHT'
         split.label(text='Channel')
         split.prop(strip, "channel", text="")
 
         sub = layout.column(align=True)
         sub.enabled = not strip.lock
-        split = sub.split(factor=0.5)
+        split = sub.split(factor=0.5+max_factor)
         split.alignment = 'RIGHT'
         split.label(text="Start")
         split.prop(strip, "frame_start", text=str(bpy.utils.smpte_from_frame(strip.frame_start)).replace(':', ' '))
-        split = sub.split(factor=0.5)
+        split = sub.split(factor=0.5+max_factor)
         split.alignment = 'RIGHT'
         split.label(text="End")
         split.prop(strip, "frame_final_end", text=str(bpy.utils.smpte_from_frame(strip.frame_final_end)).replace(':', ' '))
-        split = sub.split(factor=0.5)
+        split = sub.split(factor=0.5+max_factor)
         split.alignment = 'RIGHT'
         split.label(text="Duration")
         split.prop(strip, "frame_final_duration", text=str(bpy.utils.smpte_from_frame(strip.frame_final_duration)).replace(':', ' '))
@@ -1507,22 +1511,22 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
         if not isinstance(strip, bpy.types.EffectSequence):
             layout.alignment = 'RIGHT'
             sub = layout.column(align=True)
-            split = sub.split(factor=0.5, align=True)
+            split = sub.split(factor=0.5+max_factor, align=True)
             split.alignment = 'RIGHT'
             split.label(text="Soft Trim Start")
             split.prop(strip, "frame_offset_start", text=str(bpy.utils.smpte_from_frame(strip.frame_offset_start)).replace(':', ' '))
-            split = sub.split(factor=0.5, align=True)
+            split = sub.split(factor=0.5+max_factor, align=True)
             split.alignment = 'RIGHT'
             split.label(text='End')
             split.prop(strip, "frame_offset_end", text=str(bpy.utils.smpte_from_frame(strip.frame_offset_end)).replace(':', ' '))
 
             layout.alignment = 'RIGHT'
             sub = layout.column(align=True)
-            split = sub.split(factor=0.5)
+            split = sub.split(factor=0.5+max_factor)
             split.alignment = 'RIGHT'
             split.label(text="Hard Trim Start")
             split.prop(strip, "animation_offset_start", text=str(bpy.utils.smpte_from_frame(strip.animation_offset_start)).replace(':', ' '))
-            split = sub.split(factor=0.5, align=True)
+            split = sub.split(factor=0.5+max_factor, align=True)
             split.alignment = 'RIGHT'
             split.label(text='End')
             split.prop(strip, "animation_offset_end", text=str(bpy.utils.smpte_from_frame(strip.animation_offset_end)).replace(':', ' '))
@@ -1531,11 +1535,11 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
         col = layout.column(align=True)
         col = col.box()
         col.active = (frame_current >= strip.frame_start and frame_current <= strip.frame_start + strip.frame_final_duration)
-        split = col.split(factor=0.5)
+        split = col.split(factor=0.5+max_factor)
         split.alignment = 'RIGHT'
         split.label(text="Playhead")
-        split.alignment = 'LEFT'
-        split.label(text="%s:  %s" % ((bpy.utils.smpte_from_frame(playhead).replace(':', ' ')), (str(playhead))))
+        #split.alignment = 'LEFT'
+        split.label(text="%s:   %s" % ((bpy.utils.smpte_from_frame(playhead).replace(':', ' ')), (str(playhead))))
 
         ''' Old data - anyone missing this data?
         col.label(text=iface_("Frame Offset %d:%d") % (strip.frame_offset_start, strip.frame_offset_end),
@@ -1550,10 +1554,10 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
             elem = strip.elements[0]
 
         if strip.type != "SOUND":
-            split = col.split(factor=0.5)
+            split = col.split(factor=0.5+max_factor)
             split.alignment = 'RIGHT'
-            split.label(text="Original Resolution")
-            split.alignment = 'LEFT'
+            split.label(text="Resolution")
+            #split.alignment = 'CENTER'
             if elem and elem.orig_width > 0 and elem.orig_height > 0:
                 split.label(text="%dx%d" % (elem.orig_width, elem.orig_height), translate=False)
             else:
@@ -1565,7 +1569,7 @@ class SEQUENCER_PT_data(SequencerButtonsPanel, Panel):
             if scene:
                 sta = scene.frame_start
                 end = scene.frame_end
-                split = col.split(factor=0.5)
+                split = col.split(factor=0.5+max_factor)
                 split.alignment = 'RIGHT'
                 split.label(text="Original Frame Range")
                 split.alignment = 'LEFT'
