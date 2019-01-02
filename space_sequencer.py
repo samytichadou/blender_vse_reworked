@@ -325,12 +325,11 @@ class SEQUENCER_MT_view(Menu):
                                  
             layout.prop(st, "show_seconds", text="Seconds")            
             if context.space_data.show_seconds:
-                layout.prop(context.user_preferences.view, "timecode_style", text="")            
+                layout.prop(bpy.scene.context.user_preferences.view, "timecode_style", text="")            
 
             layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
 
         if is_preview:
-           
            
             if st.display_mode == 'IMAGE':
 
@@ -691,7 +690,6 @@ class SEQUENCER_MT_add(Menu):
 
         col = layout.column()
         col.menu("SEQUENCER_MT_add_transitions")
-        col.enabled = sel_sequences(context) >= 2
 
 
 class SEQUENCER_MT_add_empty(Menu):
@@ -954,14 +952,14 @@ class SEQUENCER_MT_strip(Menu):
                     #layout.prop(strip, "show_waveform") # only for active strip, but with checkbox.
                     layout.operator("sequencer.show_waveform_selected_sounds", text = "Toggle Draw Waveform")
 
-        if stype != 'SOUND':
+            if stype != 'SOUND':
 
-            layout.separator()
+                layout.separator()
 
-            layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")  
-            layout.operator("sequencer.strip_modifier_copy", text = "Apply Modifiers to Selection")
-            layout.operator("sequencer.toggle_all_modifiers", text ="Toggle All Modifiers")
-                                    
+                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")  
+                layout.operator("sequencer.strip_modifier_copy", text = "Apply Modifiers to Selection")
+                layout.operator("sequencer.toggle_all_modifiers", text ="Toggle All Modifiers")
+                                        
         layout.separator()
                 
         #layout.operator("sequencer.offset_clear") #Replaced by match frame
