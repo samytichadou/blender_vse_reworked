@@ -325,7 +325,7 @@ class SEQUENCER_MT_view(Menu):
                                  
             layout.prop(st, "show_seconds", text="Seconds")            
             if context.space_data.show_seconds:
-                layout.prop(bpy.scene.context.user_preferences.view, "timecode_style", text="")            
+                layout.prop(context.preferences.view, "timecode_style", text="")            
 
             layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
 
