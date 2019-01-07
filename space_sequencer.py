@@ -325,12 +325,11 @@ class SEQUENCER_MT_view(Menu):
                                  
             layout.prop(st, "show_seconds", text="Seconds")            
             if context.space_data.show_seconds:
-                layout.prop(context.user_preferences.view, "timecode_style", text="")            
+                layout.prop(context.preferences.view, "timecode_style", text="")            
 
             layout.prop_menu_enum(st, "waveform_display_type", text="Waveform")
 
         if is_preview:
-           
            
             if st.display_mode == 'IMAGE':
 
@@ -636,37 +635,39 @@ class SEQUENCER_MT_add(Menu):
     bl_label = "Add"
 
     def draw(self, context):
-        if context.selected_sequences:
-            selected_seq = len(context.selected_sequences)
-        else:
-            selected_seq = 0
 
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
 
-        if len(bpy.data.scenes) > 10:
+        bpy_data_scenes_len = len(bpy.data.scenes)
+        if bpy_data_scenes_len > 10:
             layout.operator_context = 'INVOKE_DEFAULT'
             layout.operator("sequencer.scene_strip_add", text="Scene...", icon='SCENE_DATA')
-        elif len(bpy.data.scenes) >= 1:
+        elif bpy_data_scenes_len > 1:
             layout.operator_menu_enum("sequencer.scene_strip_add", "scene", text="Scene", icon='SCENE_DATA')
         else:
             layout.menu("SEQUENCER_MT_add_empty", text="Scene", icon='SCENE_DATA')
+        del bpy_data_scenes_len
 
-        if len(bpy.data.movieclips) > 10:
+        bpy_data_movieclips_len = len(bpy.data.movieclips)
+        if bpy_data_movieclips_len > 10:
             layout.operator_context = 'INVOKE_DEFAULT'
-            layout.operator("sequencer.movieclip_strip_add", text="Clip...", icon='CLIP')
-        elif len(bpy.data.movieclips) >= 1:
-            layout.operator_menu_enum("sequencer.movieclip_strip_add", "clip", text="Clip", icon='CLIP')
+            layout.operator("sequencer.movieclip_strip_add", text="Clip...", icon='TRACKER')
+        elif bpy_data_movieclips_len > 0:
+            layout.operator_menu_enum("sequencer.movieclip_strip_add", "clip", text="Clip", icon='TRACKER')
         else:
-            layout.menu("SEQUENCER_MT_add_empty", text="Clip", icon='CLIP')
+            layout.menu("SEQUENCER_MT_add_empty", text="Clip", icon='TRACKER')
+        del bpy_data_movieclips_len
 
-        if len(bpy.data.masks) > 10:
+        bpy_data_masks_len = len(bpy.data.masks)
+        if bpy_data_masks_len > 10:
             layout.operator_context = 'INVOKE_DEFAULT'
             layout.operator("sequencer.mask_strip_add", text="Mask...", icon='MOD_MASK')
-        elif len(bpy.data.masks) >= 1:
+        elif bpy_data_masks_len > 0:
             layout.operator_menu_enum("sequencer.mask_strip_add", "mask", text="Mask", icon='MOD_MASK')
         else:
             layout.menu("SEQUENCER_MT_add_empty", text="Mask", icon='MOD_MASK')
+        del bpy_data_masks_len
 
         layout.separator()
 
@@ -689,7 +690,6 @@ class SEQUENCER_MT_add(Menu):
 
         col = layout.column()
         col.menu("SEQUENCER_MT_add_transitions")
-        col.enabled = selected_seq >= 2
 
 
 class SEQUENCER_MT_add_empty(Menu):
@@ -952,14 +952,14 @@ class SEQUENCER_MT_strip(Menu):
                     #layout.prop(strip, "show_waveform") # only for active strip, but with checkbox.
                     layout.operator("sequencer.show_waveform_selected_sounds", text = "Toggle Draw Waveform")
 
-        if stype != 'SOUND':
+            if stype != 'SOUND':
 
-            layout.separator()
+                layout.separator()
 
-            layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")  
-            layout.operator("sequencer.strip_modifier_copy", text = "Apply Modifiers to Selection")
-            layout.operator("sequencer.toggle_all_modifiers", text ="Toggle All Modifiers")
-                                    
+                layout.operator_menu_enum("sequencer.strip_modifier_add", "type", text="Add Modifier")  
+                layout.operator("sequencer.strip_modifier_copy", text = "Apply Modifiers to Selection")
+                layout.operator("sequencer.toggle_all_modifiers", text ="Toggle All Modifiers")
+                                        
         layout.separator()
                 
         #layout.operator("sequencer.offset_clear") #Replaced by match frame
